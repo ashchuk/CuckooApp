@@ -1,6 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.ashchuk.cuckooapp"
@@ -19,10 +29,70 @@ android {
 }
 
 dependencies {
+    def aac_version = "1.1.1"
+    def google_services_version = "15.0.1"
+    def work_version = "1.0.0-alpha04"
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+
+    //picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
+
+    //firebase
+    implementation 'com.google.firebase:firebase-database:16.0.1'
+    implementation 'com.google.firebase:firebase-messaging:17.1.0'
+    implementation 'com.google.firebase:firebase-auth:16.0.2'
+
+    //google services
+    implementation "com.google.android.gms:play-services-maps:$google_services_version"
+    implementation "com.google.android.gms:play-services-places:$google_services_version"
+    implementation "com.google.android.gms:play-services-location:$google_services_version"
+
+    //circleimageview
+    implementation 'de.hdodenhof:circleimageview:2.2.0'
+
+    //aac
+    implementation "android.arch.lifecycle:extensions:$aac_version"
+    implementation "android.arch.lifecycle:common-java8:$aac_version"
+    implementation "android.arch.persistence.room:runtime:$aac_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$aac_version"
+    implementation "android.arch.persistence.room:rxjava2:$aac_version"
+
+    //firebase jobDispatcher
+    implementation "android.arch.work:work-runtime:$work_version"
+    implementation "android.arch.work:work-firebase:$work_version"
+
+    //dagger 2.14.1
+    implementation 'com.google.dagger:dagger:2.14.1'
+    implementation 'com.google.dagger:dagger-android-support:2.14.1'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.14.1'
+    annotationProcessor 'com.google.dagger:dagger-android-processor:2.14.1'
+
+    //rxjava2 retrofit2
+    implementation "com.squareup.retrofit2:retrofit:2.4.0"
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.10'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+
+    //moxy
+    implementation 'com.arello-mobile:moxy:1.5.3'
+    implementation 'com.arello-mobile:moxy-app-compat:1.5.3'
+    annotationProcessor 'com.arello-mobile:moxy-compiler:1.5.3'
+
+    //espresso
+    androidTestImplementation "com.android.support:support-annotations:27.1.1"
+    implementation "com.android.support.test.espresso:espresso-idling-resource:3.0.2"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.2"
+    androidTestImplementation "com.android.support.test:rules:1.0.2"
+    androidTestImplementation "com.android.support.test:runner:1.0.2"
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:3.0.2"
+
+    //junit
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
 }
