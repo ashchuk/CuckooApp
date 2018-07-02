@@ -1,4 +1,4 @@
-package com.ashchuk.cuckooapp.ui;
+package com.ashchuk.cuckooapp.ui.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
