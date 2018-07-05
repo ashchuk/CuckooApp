@@ -10,7 +10,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.MainActivity">
+        <activity android:name=".ui.activities.AccountActivity" />
+        <activity android:name=".ui.activities.LoginActivity" />
+        <activity android:name=".ui.activities.SearchActivity" />
+        <activity android:name=".ui.activities.TodoListActivity" />
+        <activity android:name=".ui.activities.UserDetailActivity" />
+        <activity android:name=".ui.activities.SubscriptionsActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
