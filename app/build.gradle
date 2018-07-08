@@ -14,7 +14,7 @@ android {
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.ashchuk.cuckooapp"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -42,14 +42,18 @@ dependencies {
     implementation 'com.squareup.picasso:picasso:2.71828'
 
     //firebase
+    implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-database:16.0.1'
     implementation 'com.google.firebase:firebase-messaging:17.1.0'
     implementation 'com.google.firebase:firebase-auth:16.0.2'
+    implementation 'com.firebaseui:firebase-ui-database:4.1.0'
+    implementation 'com.firebaseui:firebase-ui-auth:4.1.0'
 
     //google services
     implementation "com.google.android.gms:play-services-maps:$google_services_version"
     implementation "com.google.android.gms:play-services-places:$google_services_version"
     implementation "com.google.android.gms:play-services-location:$google_services_version"
+    implementation "com.google.android.gms:play-services-auth:$google_services_version"
 
     //circleimageview
     implementation 'de.hdodenhof:circleimageview:2.2.0'
@@ -94,5 +98,6 @@ dependencies {
 
     //junit
     testImplementation 'junit:junit:4.12'
-
 }
+
+apply plugin: 'com.google.gms.google-services'
