@@ -2,8 +2,16 @@ package com.ashchuk.cuckooapp.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.view.View;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -23,7 +31,8 @@ import java.util.List;
 
 public class SubscriptionsActivity
         extends MvpAppCompatActivity
-        implements ISubscriptionsActivityView {
+        implements ISubscriptionsActivityView,
+        NavigationView.OnNavigationItemSelectedListener {
 
     @InjectPresenter
     SubscriptionsActivityPresenter subscriptionsActivityPresenter;
@@ -46,6 +55,21 @@ public class SubscriptionsActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscriptions);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show());
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -67,6 +91,7 @@ public class SubscriptionsActivity
                         RC_SIGN_IN);
             }
         };
+
     }
 
     @Override
@@ -96,9 +121,18 @@ public class SubscriptionsActivity
     }
 
     @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_subscriptions, menu);
+        getMenuInflater().inflate(R.menu.subscriptions, menu);
         return true;
     }
 
@@ -109,6 +143,7 @@ public class SubscriptionsActivity
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.add_item:
+
                 // add item
 //                User user = new User();
 //                user.uuid = "test";
@@ -142,6 +177,31 @@ public class SubscriptionsActivity
         }
     }
 
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+
+        } else if (id == R.id.nav_slideshow) {
+
+        } else if (id == R.id.nav_manage) {
+
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
     private void onSignedInInitialize(String username) {
         mUsername = username;
     }
@@ -149,5 +209,4 @@ public class SubscriptionsActivity
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
     }
-
 }

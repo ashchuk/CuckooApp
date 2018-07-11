@@ -10,17 +10,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activities.SubscriptionsActivity">
+        <activity android:name=".ui.activities.AccountActivity" />
+        <activity android:name=".ui.activities.SearchActivity" />
+        <activity android:name=".ui.activities.TodoListActivity" />
+        <activity android:name=".ui.activities.UserDetailActivity" />
+        <activity
+            android:name=".ui.activities.SubscriptionsActivity"
+            android:label="@string/title_activity_subscriptions"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.AccountActivity" />
-        <activity android:name=".ui.activities.SearchActivity" />
-        <activity android:name=".ui.activities.TodoListActivity" />
-        <activity android:name=".ui.activities.UserDetailActivity" />
     </application>
 
 </manifest>
