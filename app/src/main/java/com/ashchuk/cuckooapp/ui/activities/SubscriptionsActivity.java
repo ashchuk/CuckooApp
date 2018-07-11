@@ -4,12 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,9 +18,11 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
+import com.ashchuk.cuckooapp.services.NotificationService;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -46,6 +46,7 @@ public class SubscriptionsActivity
     private FirebaseAuth.AuthStateListener mAuthStateListener;
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
+    private ChildEventListener mChildEventListener;
 
     private List<AuthUI.IdpConfig> mAuthProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
@@ -79,6 +80,8 @@ public class SubscriptionsActivity
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user != null) {
                 onSignedInInitialize(user.getDisplayName());
+                Intent service = new Intent(this, NotificationService.class);
+                startService(service);
             } else {
                 onSignedOutCleanup();
                 startActivityForResult(
@@ -91,7 +94,6 @@ public class SubscriptionsActivity
                         RC_SIGN_IN);
             }
         };
-
     }
 
     @Override
@@ -103,8 +105,9 @@ public class SubscriptionsActivity
     @Override
     protected void onPause() {
         super.onPause();
-        if (mAuthStateListener != null)
+        if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
     }
 
     @Override
@@ -177,7 +180,6 @@ public class SubscriptionsActivity
         }
     }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -204,9 +206,12 @@ public class SubscriptionsActivity
 
     private void onSignedInInitialize(String username) {
         mUsername = username;
+        //attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
         mUsername = ANONYMOUS;
+        //detachDatabaseReadListener();
     }
+
 }
