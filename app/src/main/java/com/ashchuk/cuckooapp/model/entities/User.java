@@ -13,6 +13,5 @@ public class User {
     public String uuid;
     public String email;
     public String phoneNumber;
-    public Uri photoUri;
 //    public Location location;
 }

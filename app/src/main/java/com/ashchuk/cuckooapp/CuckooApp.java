@@ -13,7 +13,7 @@ import com.ashchuk.cuckooapp.model.db.CuckooAppDB;
 public class CuckooApp extends Application {
 
     private static AppComponent sAppComponent;
-    private CuckooAppDB database;
+    private CuckooAppDB mDatabase;
 
     @Override
     public void onCreate() {
@@ -23,7 +23,7 @@ public class CuckooApp extends Application {
                 .contextModule(new ContextModule(this))
                 .build();
 
-        database = Room.databaseBuilder(this, CuckooAppDB.class, "database")
+        mDatabase = Room.databaseBuilder(this, CuckooAppDB.class, "database")
                 .build();
     }
 
@@ -38,7 +38,7 @@ public class CuckooApp extends Application {
     }
 
     public CuckooAppDB getDatabase() {
-        return database;
+        return mDatabase;
     }
 
 }
