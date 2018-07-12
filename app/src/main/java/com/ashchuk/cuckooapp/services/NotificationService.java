@@ -8,14 +8,13 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.session.MediaSession;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.RequiresApi;
-import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import com.ashchuk.cuckooapp.R;
-import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.ui.activities.SubscriptionsActivity;
 import com.google.firebase.database.ChildEventListener;
@@ -92,12 +91,18 @@ public class NotificationService extends Service {
                 showTaskIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
+        MediaSession mMediaSession = new MediaSession(getApplicationContext(), "test");
+        Notification notification = new Notification.Builder(getApplicationContext(), channelId)
+                .setVisibility(Notification.VISIBILITY_PUBLIC)
+                .setSmallIcon(R.drawable.fui_ic_googleg_color_24dp)
+                .addAction(R.drawable.ic_menu_share, "Share", contentIntent)
+                .addAction(R.drawable.ic_menu_camera, "Camera", contentIntent)
+                .addAction(R.drawable.ic_menu_send, "Send", contentIntent)
+                .setStyle(new Notification.MediaStyle()
+                        .setShowActionsInCompactView(1 /* #1: Camera button */)
+                        .setMediaSession(mMediaSession.getSessionToken()))
                 .setContentTitle(getString(R.string.app_name))
                 .setContentText("Cuckooo app is still working")
-                .setSmallIcon(R.drawable.fui_ic_googleg_color_24dp)
-                .setWhen(System.currentTimeMillis())
-                .setContentIntent(contentIntent)
                 .build();
 
         mFirebaseDatabase = FirebaseDatabase.getInstance();
