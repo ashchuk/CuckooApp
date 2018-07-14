@@ -11,7 +11,7 @@ import java.util.Date;
 public class Subscription {
     @PrimaryKey
     public long id;
-    public User user;
+    public String userId;
     public UserStatus status;
     public Date lastUpdatedDate;
 }

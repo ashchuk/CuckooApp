@@ -13,7 +13,7 @@ import com.ashchuk.cuckooapp.model.db.CuckooAppDB;
 public class CuckooApp extends Application {
 
     private static AppComponent sAppComponent;
-    private CuckooAppDB mDatabase;
+    private static CuckooAppDB mDatabase;
 
     @Override
     public void onCreate() {
@@ -37,7 +37,7 @@ public class CuckooApp extends Application {
         sAppComponent = appComponent;
     }
 
-    public CuckooAppDB getDatabase() {
+    public static CuckooAppDB getDatabase() {
         return mDatabase;
     }
 

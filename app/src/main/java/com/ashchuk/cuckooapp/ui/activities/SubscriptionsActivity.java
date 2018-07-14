@@ -19,6 +19,10 @@ import android.widget.Toast;
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
+import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityCreator;
+import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserToUserConverter;
+import com.ashchuk.cuckooapp.model.entities.User;
+import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
@@ -31,6 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class SubscriptionsActivity
         extends MvpAppCompatActivity
@@ -143,7 +150,31 @@ public class SubscriptionsActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "Signed in!", Toast.LENGTH_SHORT).show();
+                User user = FirebaseUserToUserConverter
+                        .convert(FirebaseAuth.getInstance().getCurrentUser());
+
+                UserRepository.insertUser(user)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(integer -> {
+                            Toast.makeText(this,
+                                    "User successfully inserted into DB",
+                                    Toast.LENGTH_SHORT).show();
+                        });
+
+                UserRepository.getUsers()
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(users -> {
+                            Toast.makeText(this,
+                                    "There is " +
+                                            Integer.toString(users.size()) +
+                                            " users in DB", Toast.LENGTH_SHORT).show();
+                        });
+
+
+                Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
+
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();
@@ -175,13 +206,13 @@ public class SubscriptionsActivity
                 return true;
             case R.id.add_item:
                 notificationService.createNewNotification();
-                // add item
-//                User user = new User();
-//                user.uuid = "test";
-//                user.displayName = "test";
-//                user.email = "test@test.com";
-//                user.id = 1;
-//                mUsersDatabaseReference.push().setValue(user);
+
+                FirebaseUserEntityCreator
+                        .create(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(entity -> mUsersDatabaseReference.push().setValue(entity));
+
 
                 // get user by id
 //                Query query = mUsersDatabaseReference.orderByChild("id").equalTo(1);

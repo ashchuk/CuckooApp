@@ -7,9 +7,13 @@ import java.util.Date;
 
 @Entity
 public class Message {
+
+    public Message(){ }
+
     @PrimaryKey
     public long id;
-    public User user;
+    public String creatorId;
+    public String userId;
     public String messageText;
     public Date creationDate;
 }

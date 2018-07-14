@@ -9,7 +9,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.RingtoneManager;
-import android.media.session.MediaSession;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -53,7 +52,7 @@ public class NotificationService extends Service {
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     User user = dataSnapshot.getValue(User.class);
                     Toast.makeText(getApplicationContext(),
-                            "Changed user name is " + user.displayName,
+                            "Changed user name is " + user.DisplayName,
                             Toast.LENGTH_SHORT)
                             .show();
                 }

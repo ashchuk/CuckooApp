@@ -5,13 +5,20 @@ import android.arch.persistence.room.PrimaryKey;
 import android.location.Location;
 import android.net.Uri;
 
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
+
+import io.reactivex.annotations.NonNull;
+
 @Entity
 public class User {
+
+    public User(){ }
+
     @PrimaryKey
-    public long id;
-    public String displayName;
-    public String uuid;
-    public String email;
-    public String phoneNumber;
-//    public Location location;
+    @android.support.annotation.NonNull
+    public String Guid;
+    public String DisplayName;
+    public String Email;
+    public UserStatus Status;
+    public String PhoneNumber;
 }

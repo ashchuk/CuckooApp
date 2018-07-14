@@ -7,9 +7,12 @@ import java.util.Date;
 
 @Entity
 public class TodoItem {
+
+    public TodoItem(){ }
+
     @PrimaryKey
     public long id;
-    public User user;
+    public String userId;
     public String message;
     public Date creationDate;
     public boolean isDone;

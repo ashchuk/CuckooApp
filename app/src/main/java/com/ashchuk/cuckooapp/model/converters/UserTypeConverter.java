@@ -2,7 +2,6 @@ package com.ashchuk.cuckooapp.model.converters;
 
 import android.arch.persistence.room.TypeConverter;
 
-import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.User;
 
 public class UserTypeConverter {
@@ -13,6 +12,6 @@ public class UserTypeConverter {
 
     @TypeConverter
     public static String toUuid(User user) {
-        return user == null ? null : user.uuid;
+        return user == null ? null : user.Guid;
     }
 }
