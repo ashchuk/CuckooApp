@@ -1,7 +1,10 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.NavigationView;
@@ -52,6 +55,9 @@ public class SubscriptionsActivity
             new AuthUI.IdpConfig.EmailBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build());
 
+    private NotificationService notificationService;
+    private ServiceConnection serviceConnection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,12 +100,34 @@ public class SubscriptionsActivity
                         RC_SIGN_IN);
             }
         };
+
+        serviceConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                notificationService = ((NotificationService.NotificationServiceBinder) binder).getService();
+            }
+
+            public void onServiceDisconnected(ComponentName name) {
+            }
+        };
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, NotificationService.class);
+        bindService(intent, serviceConnection, 0);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(serviceConnection);
     }
 
     @Override
@@ -146,7 +174,7 @@ public class SubscriptionsActivity
                 AuthUI.getInstance().signOut(this);
                 return true;
             case R.id.add_item:
-
+                notificationService.createNewNotification();
                 // add item
 //                User user = new User();
 //                user.uuid = "test";
