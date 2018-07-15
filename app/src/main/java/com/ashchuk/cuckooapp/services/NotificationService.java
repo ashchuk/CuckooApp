@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.model.entities.User;
+import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.ui.activities.SubscriptionsActivity;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -46,7 +47,7 @@ public class NotificationService extends Service {
             mChildEventListener = new ChildEventListener() {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    User user = dataSnapshot.getValue(User.class);
+                    FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
                 }
 
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {

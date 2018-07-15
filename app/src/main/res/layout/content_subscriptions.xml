@@ -8,4 +8,17 @@
     tools:context=".ui.activities.SubscriptionsActivity"
     tools:showIn="@layout/app_bar_subscriptions">
 
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/subscriptions_list"
+        android:name="com.ashchuk.bakingapp.RecipeListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+        tools:context=".ui.activities.RecipeListActivity"
+        tools:listitem="@layout/subscriptions_item" />
+
 </android.support.constraint.ConstraintLayout>

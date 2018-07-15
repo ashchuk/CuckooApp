@@ -11,6 +11,8 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,11 +23,13 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityCreator;
 import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserToUserConverter;
+import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
+import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsAdapter;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -33,6 +37,7 @@ import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -47,10 +52,7 @@ public class SubscriptionsActivity
     @InjectPresenter
     SubscriptionsActivityPresenter subscriptionsActivityPresenter;
 
-    public static final String ANONYMOUS = "anonymous";
     public static final int RC_SIGN_IN = 1;
-
-    private String mUsername;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
@@ -71,10 +73,6 @@ public class SubscriptionsActivity
         setContentView(R.layout.activity_subscriptions);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -116,6 +114,15 @@ public class SubscriptionsActivity
             public void onServiceDisconnected(ComponentName name) {
             }
         };
+
+        RecyclerView recyclerView = findViewById(R.id.subscriptions_list);
+        recyclerView.setAdapter(new SubscriptionsAdapter(new ArrayList<>(Arrays
+                .asList(new Subscription(), new Subscription(), new Subscription(),
+                        new Subscription(), new Subscription(), new Subscription(),
+                        new Subscription(), new Subscription(), new Subscription(),
+                        new Subscription(), new Subscription(), new Subscription())),
+                (v, subscription) -> {}));
+        recyclerView.setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
     }
 
     @Override
@@ -264,12 +271,10 @@ public class SubscriptionsActivity
     }
 
     private void onSignedInInitialize(String username) {
-        mUsername = username;
         //attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
-        mUsername = ANONYMOUS;
         //detachDatabaseReadListener();
     }
 
