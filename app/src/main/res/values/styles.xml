@@ -13,6 +13,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="menu_labels_style">
+        <item name="android:background">@drawable/label_background</item>
+        <item name="android:textColor">@color/browser_actions_bg_grey</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:maxWidth">300dp</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

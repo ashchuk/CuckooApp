@@ -40,8 +40,8 @@ public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsView
 
     @Override
     public void onBindViewHolder(@NonNull SubscriptionsViewHolder holder, int position) {
-        TextView textView = holder.itemView.findViewById(R.id.textView);
-        textView.setText("Some text");
+//        TextView textView = holder.itemView.findViewById(R.id.textView);
+//        textView.setText("Some text");
     }
 
     @Override
