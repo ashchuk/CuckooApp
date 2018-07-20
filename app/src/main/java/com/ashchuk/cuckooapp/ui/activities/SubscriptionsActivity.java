@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -30,6 +31,7 @@ import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsAdapter;
+import com.ashchuk.cuckooapp.ui.helpers.SwipeToDeleteCallback;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -123,6 +125,17 @@ public class SubscriptionsActivity
                         new Subscription(), new Subscription(), new Subscription())),
                 (v, subscription) -> {}));
         recyclerView.setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
+
+        SwipeToDeleteCallback handler = new SwipeToDeleteCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                super.onSwiped(viewHolder, direction);
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(handler);
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+
     }
 
     @Override
