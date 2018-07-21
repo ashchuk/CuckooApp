@@ -5,8 +5,6 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,7 +15,6 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
@@ -31,7 +28,7 @@ import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
-import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsAdapter;
+import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.ashchuk.cuckooapp.ui.helpers.SwipeToDeleteCallback;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -125,7 +122,7 @@ public class SubscriptionsActivity
                         new Subscription(), new Subscription(), new Subscription()));
 
         RecyclerView recyclerView = findViewById(R.id.subscriptions_list);
-        recyclerView.setAdapter(new SubscriptionsAdapter(list,
+        recyclerView.setAdapter(new SubscriptionsListAdapter(list,
                 (v, subscription) -> {
                 }));
         recyclerView.setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
@@ -133,8 +130,7 @@ public class SubscriptionsActivity
         SwipeToDeleteCallback handler = new SwipeToDeleteCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                SubscriptionsAdapter adapter = (SubscriptionsAdapter) recyclerView.getAdapter();
+                SubscriptionsListAdapter adapter = (SubscriptionsListAdapter) recyclerView.getAdapter();
                 adapter.removeAt(viewHolder.getAdapterPosition());
                 super.onSwiped(viewHolder, direction);
             }

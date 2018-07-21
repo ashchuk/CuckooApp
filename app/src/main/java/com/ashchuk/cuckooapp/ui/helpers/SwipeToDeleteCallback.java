@@ -42,13 +42,12 @@ public abstract class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallba
         View itemView = viewHolder.itemView;
 
         Paint p = new Paint();
-        p.setARGB(255, 0, 204, 102);
+        p.setARGB(255, 120, 0, 0);
 
         Bitmap icon;
 
         icon = BitmapFactory.decodeResource(
                 CuckooApp.getAppComponent().getContext().getResources(), R.drawable.common_full_open_on_phone);
-
 
         c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
                 (float) itemView.getRight(), (float) itemView.getBottom(), p);
