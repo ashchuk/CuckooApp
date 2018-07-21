@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
@@ -117,18 +118,24 @@ public class SubscriptionsActivity
             }
         };
 
-        RecyclerView recyclerView = findViewById(R.id.subscriptions_list);
-        recyclerView.setAdapter(new SubscriptionsAdapter(new ArrayList<>(Arrays
+        List<Subscription> list = new ArrayList<>(Arrays
                 .asList(new Subscription(), new Subscription(), new Subscription(),
                         new Subscription(), new Subscription(), new Subscription(),
                         new Subscription(), new Subscription(), new Subscription(),
-                        new Subscription(), new Subscription(), new Subscription())),
-                (v, subscription) -> {}));
+                        new Subscription(), new Subscription(), new Subscription()));
+
+        RecyclerView recyclerView = findViewById(R.id.subscriptions_list);
+        recyclerView.setAdapter(new SubscriptionsAdapter(list,
+                (v, subscription) -> {
+                }));
         recyclerView.setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
 
         SwipeToDeleteCallback handler = new SwipeToDeleteCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                SubscriptionsAdapter adapter = (SubscriptionsAdapter) recyclerView.getAdapter();
+                adapter.removeAt(viewHolder.getAdapterPosition());
                 super.onSwiped(viewHolder, direction);
             }
         };

@@ -28,6 +28,7 @@ public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsView
     public SubscriptionsAdapter(List<Subscription> subscriptions, SubscriptionOnClickListener onClickListener) {
         this.subscriptions = subscriptions;
         this.onClickListener = onClickListener;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -47,5 +48,12 @@ public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsView
     @Override
     public int getItemCount() {
         return subscriptions.size();
+    }
+
+
+
+    public void removeAt(Integer position) {
+        this.subscriptions.remove(this.subscriptions.get(position));
+        notifyItemRemoved(position);
     }
 }
