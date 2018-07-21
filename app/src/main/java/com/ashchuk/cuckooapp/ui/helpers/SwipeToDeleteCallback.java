@@ -54,7 +54,7 @@ public abstract class SwipeToDeleteCallback extends ItemTouchHelper.SimpleCallba
                 (float) itemView.getRight(), (float) itemView.getBottom(), p);
 
         c.drawBitmap(icon,
-                (float) itemView.getRight() - convertDpToPx(8) - icon.getWidth(),
+                (float) itemView.getRight() - convertDpToPx(16) - icon.getWidth(),
                 (float) itemView.getTop() + ((float) itemView.getBottom() - (float) itemView.getTop() - icon.getHeight()) / 2,
                 p);
 

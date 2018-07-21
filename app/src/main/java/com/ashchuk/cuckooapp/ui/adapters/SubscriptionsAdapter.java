@@ -50,10 +50,8 @@ public class SubscriptionsAdapter extends RecyclerView.Adapter<SubscriptionsView
         return subscriptions.size();
     }
 
-
-
-    public void removeAt(Integer position) {
-        this.subscriptions.remove(this.subscriptions.get(position));
+    public void removeAt(int position) {
+        subscriptions.remove(position);
         notifyItemRemoved(position);
     }
 }
