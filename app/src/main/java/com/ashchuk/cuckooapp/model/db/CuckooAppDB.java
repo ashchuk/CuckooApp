@@ -15,6 +15,7 @@ import com.ashchuk.cuckooapp.model.entities.*;
         User.class}, version = 1)
 @TypeConverters({DateTypeConverter.class,
         UserTypeConverter.class,
+        TodoItemTypeConverter.class,
         UserStatusTypeConverter.class,
         UriTypeConverter.class})
 public abstract class CuckooAppDB extends RoomDatabase {

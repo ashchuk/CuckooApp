@@ -270,20 +270,22 @@ public class SubscriptionsActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Intent intent = new Intent();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        if (id == R.id.nav_account) {
+            intent.setClass(this, AccountActivity.class);
+        } else if (id == R.id.nav_search) {
+            intent.setClass(this, SearchActivity.class);
+        } else if (id == R.id.nav_todos) {
+            intent.setClass(this, TodoListActivity.class);
+        } else if (id == R.id.nav_subscriptions) {
+            intent.setClass(this, SubscriptionsActivity.class);
+        } else if (id == R.id.nav_logout) {
+            AuthUI.getInstance().signOut(this);
         }
+
+        if (intent.getComponent() != null)
+            startActivity(intent);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
