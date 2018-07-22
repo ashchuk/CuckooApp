@@ -27,6 +27,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import io.reactivex.Observable;
 
 // startForeground fail after upgrade to Android 8.1
 // https://stackoverflow.com/questions/47531742/startforeground-fail-after-upgrade-to-android-8-1
@@ -51,7 +58,7 @@ public class NotificationService extends Service {
                 }
 
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    User user = dataSnapshot.getValue(User.class);
+                    FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
                     Toast.makeText(getApplicationContext(),
                             "Changed user name is " + user.DisplayName,
                             Toast.LENGTH_SHORT)
@@ -157,6 +164,11 @@ public class NotificationService extends Service {
         startForeground(101, notification);
 
 
+    }
+
+    public void AddFirebaseListener(ValueEventListener listener, String guid){
+        Query query = mUsersDatabaseReference.orderByChild("Guid"); //.equalTo(guid)
+        query.addListenerForSingleValueEvent(listener);
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

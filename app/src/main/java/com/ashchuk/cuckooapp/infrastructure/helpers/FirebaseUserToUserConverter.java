@@ -5,7 +5,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class FirebaseUserToUserConverter {
 
-    public static User convert(FirebaseUser firebaseUser){
+    public static User convert(FirebaseUser firebaseUser) {
 
         User user = new User();
         user.Guid = firebaseUser.getUid();

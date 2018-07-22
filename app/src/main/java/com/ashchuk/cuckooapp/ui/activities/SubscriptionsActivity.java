@@ -236,26 +236,6 @@ public class SubscriptionsActivity
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribe(entity -> mUsersDatabaseReference.push().setValue(entity));
 
-
-                // get user by id
-//                Query query = mUsersDatabaseReference.orderByChild("id").equalTo(1);
-//                query.addListenerForSingleValueEvent(new ValueEventListener() {
-//                    @Override
-//                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                        if (dataSnapshot.exists()) {
-//                            // dataSnapshot is the "issue" node with all children with id 0
-//                            for (DataSnapshot user : dataSnapshot.getChildren()) {
-//                                Object test = user.getValue();
-//                            }
-//                        }
-//                    }
-//
-//                    @Override
-//                    public void onCancelled(DatabaseError databaseError) {
-//
-//                    }
-//                });
-
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -274,8 +254,6 @@ public class SubscriptionsActivity
             intent.setClass(this, SearchActivity.class);
         } else if (id == R.id.nav_todos) {
             intent.setClass(this, TodoListActivity.class);
-        } else if (id == R.id.nav_subscriptions) {
-            intent.setClass(this, SubscriptionsActivity.class);
         } else if (id == R.id.nav_logout) {
             AuthUI.getInstance().signOut(this);
         }
@@ -289,11 +267,9 @@ public class SubscriptionsActivity
     }
 
     private void onSignedInInitialize(String username) {
-        //attachDatabaseReadListener();
     }
 
     private void onSignedOutCleanup() {
-        //detachDatabaseReadListener();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ashchuk.cuckooapp.infrastructure.helpers;
 
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.MessagesRepository;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
@@ -22,7 +23,7 @@ public class FirebaseUserEntityCreator {
                     entity.Email = user.Email;
                     entity.Todos = todoItems;
                     entity.DisplayName = user.DisplayName;
-                    entity.Status = user.Status.getValue();
+                    entity.Status = user.Status == null ? UserStatus.HOME.getValue() : user.Status.getValue();
                     entity.Messages = messages;
                     entity.Subscriptions = subscriptions;
 
