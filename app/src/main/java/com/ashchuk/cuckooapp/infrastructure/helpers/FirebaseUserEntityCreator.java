@@ -19,11 +19,13 @@ public class FirebaseUserEntityCreator {
                 (user, subscriptions, todoItems, messages) -> {
                     FirebaseUserEntity entity = new FirebaseUserEntity();
 
-                    entity.UserGuid = user.Guid;
+                    entity.Guid = user.Guid;
                     entity.Email = user.Email;
-                    entity.Todos = todoItems;
+                    entity.PhoneNumber = user.PhoneNumber;
                     entity.DisplayName = user.DisplayName;
                     entity.Status = user.Status == null ? UserStatus.HOME.getValue() : user.Status.getValue();
+
+                    entity.Todos = todoItems;
                     entity.Messages = messages;
                     entity.Subscriptions = subscriptions;
 

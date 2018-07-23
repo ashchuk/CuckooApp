@@ -3,55 +3,31 @@ package com.ashchuk.cuckooapp.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class FirebaseUpdateService extends IntentService {
-    // TODO: Rename actions, choose action names that describe tasks that this
-    // IntentService can perform, e.g. ACTION_FETCH_NEW_ITEMS
-    private static final String ACTION_FOO = "com.ashchuk.cuckooapp.services.action.FOO";
-    private static final String ACTION_BAZ = "com.ashchuk.cuckooapp.services.action.BAZ";
-
-    // TODO: Rename parameters
-    private static final String EXTRA_PARAM1 = "com.ashchuk.cuckooapp.services.extra.PARAM1";
-    private static final String EXTRA_PARAM2 = "com.ashchuk.cuckooapp.services.extra.PARAM2";
+    private static final String UPDATE_STATUS = "com.ashchuk.cuckooapp.services.action.UPDATE_STATUS";
+    private static final String EXTRA_STATUS = "com.ashchuk.cuckooapp.services.extra.STATUS";
+    private static final String USER_GUID = "com.ashchuk.cuckooapp.services.extra.USER_GUID";
 
     public FirebaseUpdateService() {
         super("FirebaseUpdateService");
     }
 
-    /**
-     * Starts this service to perform action Foo with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionFoo(Context context, String param1, String param2) {
+    public static void changeUserStatus(Context context, UserStatus userStatus, String guid) {
         Intent intent = new Intent(context, FirebaseUpdateService.class);
-        intent.setAction(ACTION_FOO);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
-        context.startService(intent);
-    }
-
-    /**
-     * Starts this service to perform action Baz with the given parameters. If
-     * the service is already performing a task this action will be queued.
-     *
-     * @see IntentService
-     */
-    // TODO: Customize helper method
-    public static void startActionBaz(Context context, String param1, String param2) {
-        Intent intent = new Intent(context, FirebaseUpdateService.class);
-        intent.setAction(ACTION_BAZ);
-        intent.putExtra(EXTRA_PARAM1, param1);
-        intent.putExtra(EXTRA_PARAM2, param2);
+        intent.setAction(UPDATE_STATUS);
+        intent.putExtra(EXTRA_STATUS, userStatus.getValue());
+        intent.putExtra(USER_GUID, guid);
         context.startService(intent);
     }
 
@@ -59,33 +35,43 @@ public class FirebaseUpdateService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
             final String action = intent.getAction();
-            if (ACTION_FOO.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionFoo(param1, param2);
-            } else if (ACTION_BAZ.equals(action)) {
-                final String param1 = intent.getStringExtra(EXTRA_PARAM1);
-                final String param2 = intent.getStringExtra(EXTRA_PARAM2);
-                handleActionBaz(param1, param2);
+            if (UPDATE_STATUS.equals(action)) {
+                UserStatus userStatus = UserStatus
+                        .valueOf(intent.getIntExtra(EXTRA_STATUS, UserStatus.HOME.getValue()));
+                String guid = intent.getStringExtra(USER_GUID);
+                handleStatusUpdating(userStatus, guid);
             }
         }
     }
 
-    /**
-     * Handle action Foo in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionFoo(String param1, String param2) {
-        // TODO: Handle action Foo
-        throw new UnsupportedOperationException("Not yet implemented");
-    }
+    private void handleStatusUpdating(UserStatus userStatus, String guid) {
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(guid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
-    private void handleActionBaz(String param1, String param2) {
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
+                if (key == null)
+                    return;
+
+                Map<String, Object> childUpdates = new HashMap<>();
+                childUpdates.put("users/" + key + "/Status", userStatus.getValue());
+
+                FirebaseDatabase.getInstance()
+                        .getReference()
+                        .updateChildren(childUpdates);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
     }
 }

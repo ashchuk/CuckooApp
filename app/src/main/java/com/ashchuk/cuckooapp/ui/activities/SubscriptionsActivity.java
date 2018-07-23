@@ -1,6 +1,7 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,10 +17,14 @@ import android.widget.Toast;
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
+import com.ashchuk.cuckooapp.databinding.ActivitySubscriptionsBinding;
+import com.ashchuk.cuckooapp.databinding.ContentSubscriptionsBinding;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
+import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
 import com.ashchuk.cuckooapp.services.NotificationService;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.ashchuk.cuckooapp.ui.helpers.SwipeToDeleteCallback;
@@ -51,18 +56,18 @@ public class SubscriptionsActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subscriptions);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        ActivitySubscriptionsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_subscriptions);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        setSupportActionBar(binding.includeAppBarSubscriptions.toolbar);
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, binding.drawerLayout, binding.includeAppBarSubscriptions.toolbar,
+                R.string.navigation_drawer_open,
+                R.string.navigation_drawer_close);
+        binding.drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        binding.navView.setNavigationItemSelectedListener(this);
 
         List<Subscription> list = new ArrayList<>(Arrays
                 .asList(new Subscription(), new Subscription(), new Subscription(),
@@ -70,23 +75,59 @@ public class SubscriptionsActivity
                         new Subscription(), new Subscription(), new Subscription(),
                         new Subscription(), new Subscription(), new Subscription()));
 
-        RecyclerView recyclerView = findViewById(R.id.subscriptions_list);
-        recyclerView.setAdapter(new SubscriptionsListAdapter(list,
+        binding.includeAppBarSubscriptions
+                .includeContentSubscriptions
+                .subscriptionsList.setAdapter(new SubscriptionsListAdapter(list,
                 (v, subscription) -> {
                 }));
-        recyclerView.setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
+
+        binding.includeAppBarSubscriptions
+                .includeContentSubscriptions
+                .subscriptionsList
+                .setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
 
         SwipeToDeleteCallback handler = new SwipeToDeleteCallback(0, ItemTouchHelper.LEFT) {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                SubscriptionsListAdapter adapter = (SubscriptionsListAdapter) recyclerView.getAdapter();
+                SubscriptionsListAdapter adapter = (SubscriptionsListAdapter)
+                        binding.includeAppBarSubscriptions
+                                .includeContentSubscriptions
+                                .subscriptionsList.getAdapter();
                 adapter.removeAt(viewHolder.getAdapterPosition());
                 super.onSwiped(viewHolder, direction);
             }
         };
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(handler);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
+        itemTouchHelper
+                .attachToRecyclerView(binding.includeAppBarSubscriptions
+                        .includeContentSubscriptions
+                        .subscriptionsList);
+
+        binding.includeAppBarSubscriptions
+                .fabStatusHome.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.HOME,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        binding.includeAppBarSubscriptions
+                .fabStatusWork.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.WORK,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        binding.includeAppBarSubscriptions
+                .fabStatusWalk.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.WALK,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        binding.includeAppBarSubscriptions
+                .fabStatusCar.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.DRIVE,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        binding.includeAppBarSubscriptions
+                .fabStatusLunch.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.LUNCH,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
+        binding.includeAppBarSubscriptions
+                .fabStatusSleep.setOnClickListener(view -> FirebaseUpdateService
+                .changeUserStatus(this, UserStatus.SLEEP,
+                        FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
     }
 
@@ -112,8 +153,6 @@ public class SubscriptionsActivity
 
                 User user = SubscriptionsActivityPresenter
                         .InsertUserIntoDb(FirebaseAuth.getInstance().getCurrentUser());
-
-                SubscriptionsActivityPresenter.UpdateFirebaseUser();
 
                 Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
