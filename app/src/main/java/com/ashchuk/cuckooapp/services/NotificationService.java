@@ -40,7 +40,6 @@ import io.reactivex.Observable;
 
 public class NotificationService extends Service {
 
-    private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mUsersDatabaseReference;
     private ChildEventListener mChildEventListener;
 
@@ -106,31 +105,30 @@ public class NotificationService extends Service {
 
 //        https://developer.android.com/training/notify-user/custom-notification
 
-            MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(), "cuckoo");
-            Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
-                    .setSound(alarmSound)
-                    .setSmallIcon(R.drawable.fui_ic_googleg_color_24dp)
-                    .addAction(R.drawable.ic_menu_share, "Share", contentIntent)
-                    .addAction(R.drawable.ic_menu_camera, "Camera", contentIntent)
-                    .addAction(R.drawable.ic_menu_send, "Send", contentIntent)
-                    .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                            .setShowActionsInCompactView(1 /* #1: pause button */)
-                            .setMediaSession(mMediaSession.getSessionToken()))
-                    .setContentTitle(getString(R.string.app_name))
-                    .setContentText("Cuckooo app is still working")
-                    .build();
+        MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(), "cuckoo");
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
+                .setSound(alarmSound)
+                .setSmallIcon(R.drawable.fui_ic_googleg_color_24dp)
+                .addAction(R.drawable.ic_menu_share, "Share", contentIntent)
+                .addAction(R.drawable.ic_menu_camera, "Camera", contentIntent)
+                .addAction(R.drawable.ic_menu_send, "Send", contentIntent)
+                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
+                        .setShowActionsInCompactView(1 /* #1: pause button */)
+                        .setMediaSession(mMediaSession.getSessionToken()))
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("Cuckooo app is still working")
+                .build();
 
-            mFirebaseDatabase = FirebaseDatabase.getInstance();
-            mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
-            attachDatabaseReadListener();
+        mUsersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        attachDatabaseReadListener();
 
-            startForeground(101, notification);
+        startForeground(101, notification);
 
         return START_STICKY;
     }
 
-    public void createNewNotification(){
+    public void createNewNotification() {
         Intent showTaskIntent = new Intent(getApplicationContext(), SubscriptionsActivity.class);
         showTaskIntent.setAction(Intent.ACTION_MAIN);
         showTaskIntent.addCategory(Intent.CATEGORY_LAUNCHER);
@@ -166,7 +164,7 @@ public class NotificationService extends Service {
 
     }
 
-    public void AddFirebaseListener(ValueEventListener listener, String guid){
+    public void AddFirebaseListener(ValueEventListener listener, String guid) {
         Query query = mUsersDatabaseReference.orderByChild("Guid"); //.equalTo(guid)
         query.addListenerForSingleValueEvent(listener);
     }
@@ -192,9 +190,13 @@ public class NotificationService extends Service {
     }
 
     @Override
-    public IBinder onBind(Intent intent) { return binder; }
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
 
     public class NotificationServiceBinder extends Binder {
-        public NotificationService getService(){ return NotificationService.this; }
+        public NotificationService getService() {
+            return NotificationService.this;
+        }
     }
 }

@@ -42,6 +42,11 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/cuckoo_app_widget_info" />
         </receiver>
+
+        <service
+            android:name=".services.FirebaseQueryService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

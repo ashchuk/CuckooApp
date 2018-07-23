@@ -1,10 +1,7 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -13,18 +10,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
-import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityCreator;
-import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserToUserConverter;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
-import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
@@ -33,16 +26,10 @@ import com.ashchuk.cuckooapp.ui.helpers.SwipeToDeleteCallback;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class SubscriptionsActivity
         extends MvpAppCompatActivity
@@ -56,16 +43,10 @@ public class SubscriptionsActivity
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mUsersDatabaseReference;
-    private ChildEventListener mChildEventListener;
 
     private List<AuthUI.IdpConfig> mAuthProviders = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),
             new AuthUI.IdpConfig.GoogleBuilder().build());
-
-    private NotificationService notificationService;
-    private ServiceConnection serviceConnection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,38 +63,6 @@ public class SubscriptionsActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mUsersDatabaseReference = mFirebaseDatabase.getReference().child("users");
-
-        mAuthStateListener = firebaseAuth -> {
-            FirebaseUser user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-                onSignedInInitialize(user.getDisplayName());
-                Intent service = new Intent(this, NotificationService.class);
-                startService(service);
-            } else {
-                onSignedOutCleanup();
-                startActivityForResult(
-                        AuthUI.getInstance()
-                                .createSignInIntentBuilder()
-                                .setIsSmartLockEnabled(false)
-                                .setLogo(R.drawable.logo)
-                                .setAvailableProviders(mAuthProviders)
-                                .build(),
-                        RC_SIGN_IN);
-            }
-        };
-
-        serviceConnection = new ServiceConnection() {
-            public void onServiceConnected(ComponentName name, IBinder binder) {
-                notificationService = ((NotificationService.NotificationServiceBinder) binder).getService();
-            }
-
-            public void onServiceDisconnected(ComponentName name) {
-            }
-        };
 
         List<Subscription> list = new ArrayList<>(Arrays
                 .asList(new Subscription(), new Subscription(), new Subscription(),
@@ -142,22 +91,9 @@ public class SubscriptionsActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        Intent intent = new Intent(this, NotificationService.class);
-        bindService(intent, serviceConnection, 0);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        unbindService(serviceConnection);
     }
 
     @Override
@@ -173,31 +109,13 @@ public class SubscriptionsActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                User user = FirebaseUserToUserConverter
-                        .convert(FirebaseAuth.getInstance().getCurrentUser());
 
-                UserRepository.insertUser(user)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(integer -> {
-                            Toast.makeText(this,
-                                    "User successfully inserted into DB",
-                                    Toast.LENGTH_SHORT).show();
-                        });
+                User user = SubscriptionsActivityPresenter
+                        .InsertUserIntoDb(FirebaseAuth.getInstance().getCurrentUser());
 
-                UserRepository.getUsers()
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(users -> {
-                            Toast.makeText(this,
-                                    "There is " +
-                                            Integer.toString(users.size()) +
-                                            " users in DB", Toast.LENGTH_SHORT).show();
-                        });
-
+                SubscriptionsActivityPresenter.UpdateFirebaseUser();
 
                 Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
-
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();
@@ -212,33 +130,6 @@ public class SubscriptionsActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
-        }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.subscriptions, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                AuthUI.getInstance().signOut(this);
-                return true;
-            case R.id.add_item:
-                notificationService.createNewNotification();
-
-                FirebaseUserEntityCreator
-                        .create(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(entity -> mUsersDatabaseReference.push().setValue(entity));
-
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -266,10 +157,24 @@ public class SubscriptionsActivity
         return true;
     }
 
-    private void onSignedInInitialize(String username) {
+    @Override
+    public void CheckAuth() {
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        mAuthStateListener = firebaseAuth -> {
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            if (user != null) {
+                Intent service = new Intent(this, NotificationService.class);
+                startService(service);
+            } else {
+                startActivityForResult(
+                        AuthUI.getInstance()
+                                .createSignInIntentBuilder()
+                                .setIsSmartLockEnabled(false)
+                                .setLogo(R.drawable.logo)
+                                .setAvailableProviders(mAuthProviders)
+                                .build(),
+                        RC_SIGN_IN);
+            }
+        };
     }
-
-    private void onSignedOutCleanup() {
-    }
-
 }
