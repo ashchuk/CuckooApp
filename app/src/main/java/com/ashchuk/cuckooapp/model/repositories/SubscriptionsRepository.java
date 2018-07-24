@@ -21,6 +21,11 @@ public class SubscriptionsRepository {
                 .toObservable()
                 .debounce(400, TimeUnit.MILLISECONDS);
     }
+    public static Observable<Subscription> getSubscriptionById(String subscriptionId) {
+        return CuckooApp.getDatabase().subscriptionDAO().getSubscriptionById(subscriptionId)
+                .toObservable()
+                .debounce(400, TimeUnit.MILLISECONDS);
+    }
 
     public static Observable<Integer> insertSubscription(Subscription subscription) {
         return Observable

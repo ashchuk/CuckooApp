@@ -5,9 +5,11 @@ import android.content.Intent;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.Message;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
+import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -16,9 +18,12 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.reactivex.schedulers.Schedulers;
+
 public class FirebaseUpdateService extends IntentService {
     private static final String UPDATE_STATUS = "com.ashchuk.cuckooapp.services.action.UPDATE_STATUS";
-    private static final String UPDATE_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.UPDATE_SUBSCRIPTION";
+    private static final String ADD_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.ADD_SUBSCRIPTION";
+    private static final String REMOVE_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.REMOVE_SUBSCRIPTION";
     private static final String UPDATE_MESSAGE = "com.ashchuk.cuckooapp.services.action.UPDATE_MESSAGE";
     private static final String ADD_TODO = "com.ashchuk.cuckooapp.services.action.ADD_TODO";
     private static final String REMOVE_TODO = "com.ashchuk.cuckooapp.services.action.REMOVE_TODO";
@@ -68,10 +73,14 @@ public class FirebaseUpdateService extends IntentService {
                         .valueOf(intent.getIntExtra(EXTRA_STATUS, UserStatus.HOME.getValue()));
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 handleStatusUpdating(userStatus, userGuid);
-            } else if (UPDATE_SUBSCRIPTION.equals(action)) {
+            } else if (ADD_SUBSCRIPTION.equals(action)) {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String subscriptionGuid = intent.getStringExtra(EXTRA_SUBSCRIPTION_GUID);
-                handleSubscriptionUpdating(userGuid, subscriptionGuid);
+                handleSubscriptionAdd(userGuid, subscriptionGuid);
+            } else if (REMOVE_SUBSCRIPTION.equals(action)) {
+                String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
+                String subscriptionGuid = intent.getStringExtra(EXTRA_SUBSCRIPTION_GUID);
+                handleSubscriptionRemove(userGuid, subscriptionGuid);
             } else if (UPDATE_MESSAGE.equals(action)) {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String creatorGuid = intent.getStringExtra(EXTRA_CREATOR_GUID);
@@ -97,6 +106,8 @@ public class FirebaseUpdateService extends IntentService {
             }
         }
     }
+
+
 
     private void handleGpsSet(String userGuid, String gps) {
 
@@ -141,7 +152,87 @@ public class FirebaseUpdateService extends IntentService {
 
     }
 
-    private void handleSubscriptionUpdating(String userGuid, String subscriptionGuid) {
+    private void handleSubscriptionAdd(String userGuid, String subscriptionGuid) {
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                FirebaseUserEntity finalEntity = entity;
+                String finalKey = key;
+                SubscriptionsRepository.getSubscriptionById(subscriptionGuid)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(subscription -> {
+
+                            finalEntity.Subscriptions.add(subscription);
+
+                            FirebaseDatabase.getInstance()
+                                    .getReference()
+                                    .child("users")
+                                    .child(finalKey)
+                                    .setValue(finalEntity);
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private void handleSubscriptionRemove(String userGuid, String subscriptionGuid) {
+
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                FirebaseUserEntity finalEntity = entity;
+                String finalKey = key;
+                SubscriptionsRepository.getSubscriptionById(subscriptionGuid)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(subscription -> {
+
+                            finalEntity.Subscriptions.remove(subscription);
+
+                            FirebaseDatabase.getInstance()
+                                    .getReference()
+                                    .child("users")
+                                    .child(finalKey)
+                                    .setValue(finalEntity);
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
