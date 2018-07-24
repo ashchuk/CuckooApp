@@ -2,6 +2,7 @@ package com.ashchuk.cuckooapp.model.entities;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 
@@ -10,8 +11,9 @@ import java.util.Date;
 @Entity
 public class Subscription {
     @PrimaryKey
-    public long id;
+    @NonNull
+    public String id;
     public String userId;
-    public UserStatus status;
+    public Integer status;
     public Date lastUpdatedDate;
 }

@@ -12,6 +12,7 @@ public class FirebaseUserEntity {
     public String Email;
     public Integer Status;
     public String PhoneNumber;
+    public String Gps;
     public List<TodoItem> Todos;
     public List<Subscription> Subscriptions;
     public List<Message> Messages;

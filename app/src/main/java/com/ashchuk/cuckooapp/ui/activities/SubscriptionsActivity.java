@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.ashchuk.cuckooapp.infrastructure.Constants.AUTH_PROVIDERS;
+
 public class SubscriptionsActivity
         extends MvpAppCompatActivity
         implements ISubscriptionsActivityView,
@@ -48,10 +50,6 @@ public class SubscriptionsActivity
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
-
-    private List<AuthUI.IdpConfig> mAuthProviders = Arrays.asList(
-            new AuthUI.IdpConfig.EmailBuilder().build(),
-            new AuthUI.IdpConfig.GoogleBuilder().build());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +127,11 @@ public class SubscriptionsActivity
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
+        FirebaseUpdateService.updateUserMessage(this,
+                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                "8160fd9f-a3e8-4eb5-b78c-58dde56b2793",
+                "wololo");
     }
 
     @Override
@@ -210,7 +213,7 @@ public class SubscriptionsActivity
                                 .createSignInIntentBuilder()
                                 .setIsSmartLockEnabled(false)
                                 .setLogo(R.drawable.logo)
-                                .setAvailableProviders(mAuthProviders)
+                                .setAvailableProviders(AUTH_PROVIDERS)
                                 .build(),
                         RC_SIGN_IN);
             }

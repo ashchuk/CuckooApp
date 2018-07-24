@@ -21,4 +21,5 @@ public class User {
     public String Email;
     public UserStatus Status;
     public String PhoneNumber;
+    public String Gps;
 }

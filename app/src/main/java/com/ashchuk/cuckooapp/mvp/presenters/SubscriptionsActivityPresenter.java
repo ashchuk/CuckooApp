@@ -40,8 +40,10 @@ public class SubscriptionsActivityPresenter extends MvpPresenter<ISubscriptionsA
     }
 
     public static Observable<FirebaseUserEntity> UpdateFirebaseUser() {
+//        return FirebaseUserEntityCreator
+//                .create(FirebaseAuth.getInstance().getCurrentUser().getUid());
         return FirebaseUserEntityCreator
-                .create(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                .createDummy(FirebaseAuth.getInstance().getCurrentUser().getUid());
     }
 
 }
