@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Constants {
     public final static String CUCKOO_APP_ENDPOINT = "localhost";
+    public final static String USER_GUID_FLAG = "com.ashchuk.cuckooapp.infrastructure.USER_GUID";
+    public static final String USER_STATUS_FLAG = "com.ashchuk.cuckooapp.infrastructure.USER_STATUS";
 
     public static List<AuthUI.IdpConfig> AUTH_PROVIDERS = Arrays.asList(
             new AuthUI.IdpConfig.EmailBuilder().build(),

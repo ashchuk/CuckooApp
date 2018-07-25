@@ -22,6 +22,7 @@ import com.ashchuk.cuckooapp.databinding.ContentSubscriptionsBinding;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
+import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
@@ -36,7 +37,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+
 import static com.ashchuk.cuckooapp.infrastructure.Constants.AUTH_PROVIDERS;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
 
 public class SubscriptionsActivity
         extends MvpAppCompatActivity
@@ -127,11 +132,11 @@ public class SubscriptionsActivity
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-        FirebaseUpdateService.updateUserMessage(this,
-                FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                FirebaseAuth.getInstance().getCurrentUser().getUid(),
-                "8160fd9f-a3e8-4eb5-b78c-58dde56b2793",
-                "wololo");
+//        FirebaseUpdateService.updateUserMessage(this,
+//                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+//                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+//                "8160fd9f-a3e8-4eb5-b78c-58dde56b2793",
+//                "wololo");
     }
 
     @Override
@@ -206,6 +211,7 @@ public class SubscriptionsActivity
             FirebaseUser user = firebaseAuth.getCurrentUser();
             if (user != null) {
                 Intent service = new Intent(this, NotificationService.class);
+                getIntent().putExtra(USER_STATUS_FLAG, user.getUid());
                 startService(service);
             } else {
                 startActivityForResult(

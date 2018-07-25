@@ -1,11 +1,11 @@
 package com.ashchuk.cuckooapp.services;
 
 import android.app.IntentService;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.Message;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
@@ -44,26 +44,6 @@ public class FirebaseUpdateService extends IntentService {
 
     public FirebaseUpdateService() {
         super("FirebaseUpdateService");
-    }
-
-    public static void changeUserStatus(Context context, UserStatus userStatus, String guid) {
-        Intent intent = new Intent(context, FirebaseUpdateService.class);
-        intent.setAction(UPDATE_STATUS);
-        intent.putExtra(EXTRA_STATUS, userStatus.getValue());
-        intent.putExtra(EXTRA_USER_GUID, guid);
-        context.startService(intent);
-    }
-
-    public static void updateUserMessage(Context context,
-                                         String userGuid, String creatorGuid,
-                                         String messageGuid, String messageText) {
-        Intent intent = new Intent(context, FirebaseUpdateService.class);
-        intent.setAction(UPDATE_MESSAGE);
-        intent.putExtra(EXTRA_CREATOR_GUID, creatorGuid);
-        intent.putExtra(EXTRA_MESSAGE_GUID, messageGuid);
-        intent.putExtra(EXTRA_USER_GUID, userGuid);
-        intent.putExtra(EXTRA_MESSAGE_TEXT, messageText);
-        context.startService(intent);
     }
 
     @Override
@@ -108,6 +88,26 @@ public class FirebaseUpdateService extends IntentService {
                 handleGpsSet(userGuid, gps);
             }
         }
+    }
+
+    public static PendingIntent createChangeUserStatusPendingtIntent(Context context, UserStatus userStatus, String guid) {
+        Intent intent = new Intent(context, FirebaseUpdateService.class);
+        intent.setAction(UPDATE_STATUS);
+        intent.putExtra(EXTRA_STATUS, userStatus.getValue());
+        intent.putExtra(EXTRA_USER_GUID, guid);
+        return PendingIntent.getService(
+                context,
+                userStatus.getValue(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT);
+    }
+
+    public static void changeUserStatus(Context context, UserStatus userStatus, String guid) {
+        Intent intent = new Intent(context, FirebaseUpdateService.class);
+        intent.setAction(UPDATE_STATUS);
+        intent.putExtra(EXTRA_STATUS, userStatus.getValue());
+        intent.putExtra(EXTRA_USER_GUID, guid);
+        context.startService(intent);
     }
 
     private void handleTodoDone(String userGuid, String todoGuid) {

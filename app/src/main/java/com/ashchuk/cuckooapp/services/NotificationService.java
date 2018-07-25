@@ -3,7 +3,6 @@ package com.ashchuk.cuckooapp.services;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -16,12 +15,11 @@ import android.os.IBinder;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
-import android.widget.Toast;
 
 import com.ashchuk.cuckooapp.R;
-import com.ashchuk.cuckooapp.model.entities.User;
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
-import com.ashchuk.cuckooapp.ui.activities.SubscriptionsActivity;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -30,17 +28,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import io.reactivex.Observable;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_GUID_FLAG;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
 
 // startForeground fail after upgrade to Android 8.1
 // https://stackoverflow.com/questions/47531742/startforeground-fail-after-upgrade-to-android-8-1
 
 public class NotificationService extends Service {
 
-    private DatabaseReference mUsersDatabaseReference;
+    private DatabaseReference mUserReference;
     private ChildEventListener mChildEventListener;
 
     private NotificationServiceBinder binder = new NotificationServiceBinder();
@@ -54,14 +50,46 @@ public class NotificationService extends Service {
                 @Override
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
+
+                    Integer icon = R.drawable.home_icon;
+
+                    if (UserStatus.valueOf(user.Status) == UserStatus.HOME) {
+                        icon = R.drawable.home_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WORK) {
+                        icon = R.drawable.work_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.LUNCH) {
+                        icon = R.drawable.food_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.DRIVE) {
+                        icon = R.drawable.car_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WALK) {
+                        icon = R.drawable.walk_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.SLEEP) {
+                        icon = R.drawable.sleep_icon;
+                    }
+
+                    startForeground(101, CreateNotification(icon));
                 }
 
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
-                    Toast.makeText(getApplicationContext(),
-                            "Changed user name is " + user.DisplayName,
-                            Toast.LENGTH_SHORT)
-                            .show();
+
+                    Integer icon = R.drawable.home_icon;
+
+                    if (UserStatus.valueOf(user.Status) == UserStatus.HOME) {
+                        icon = R.drawable.home_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WORK) {
+                        icon = R.drawable.work_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.LUNCH) {
+                        icon = R.drawable.food_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.DRIVE) {
+                        icon = R.drawable.car_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WALK) {
+                        icon = R.drawable.walk_icon;
+                    } else if (UserStatus.valueOf(user.Status) == UserStatus.SLEEP) {
+                        icon = R.drawable.sleep_icon;
+                    }
+
+                    startForeground(101, CreateNotification(icon));
                 }
 
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -73,99 +101,86 @@ public class NotificationService extends Service {
                 public void onCancelled(DatabaseError databaseError) {
                 }
             };
-            mUsersDatabaseReference.addChildEventListener(mChildEventListener);
+            mUserReference.addChildEventListener(mChildEventListener);
         }
     }
 
     private void detachDatabaseReadListener() {
         if (mChildEventListener != null) {
-            mUsersDatabaseReference.removeEventListener(mChildEventListener);
+            mUserReference.removeEventListener(mChildEventListener);
             mChildEventListener = null;
         }
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Intent showTaskIntent = new Intent(getApplicationContext(), SubscriptionsActivity.class);
-        showTaskIntent.setAction(Intent.ACTION_MAIN);
-        showTaskIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        showTaskIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
+    private Notification CreateNotification(Integer currentIcon) {
         String channelId;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             channelId = createNotificationChannel();
         else
             channelId = "";
 
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                showTaskIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-//        https://developer.android.com/training/notify-user/custom-notification
-
         MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(), "cuckoo");
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
                 .setSound(alarmSound)
-                .setSmallIcon(R.drawable.fui_ic_googleg_color_24dp)
-                .addAction(R.drawable.ic_menu_share, "Share", contentIntent)
-                .addAction(R.drawable.ic_menu_camera, "Camera", contentIntent)
-                .addAction(R.drawable.ic_menu_send, "Send", contentIntent)
+                .setSmallIcon(currentIcon)
+                .addAction(R.drawable.home_icon, "Home",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.HOME,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                .addAction(R.drawable.work_icon, "Work",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.WORK,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                .addAction(R.drawable.food_icon, "Lunch",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.LUNCH,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                .addAction(R.drawable.walk_icon, "Walking",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.WALK,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                .addAction(R.drawable.car_icon, "Driving",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.DRIVE,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                .addAction(R.drawable.sleep_icon, "Sleep",
+                        FirebaseUpdateService
+                                .createChangeUserStatusPendingtIntent(getApplicationContext(),
+                                        UserStatus.SLEEP,
+                                        FirebaseAuth.getInstance().getCurrentUser().getUid()))
                 .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(1 /* #1: pause button */)
+                        .setShowActionsInCompactView(1, 2, 3 /* #1: pause button */)
                         .setMediaSession(mMediaSession.getSessionToken()))
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("Cuckooo app is still working")
+                .setContentText("You can set your current status here")
                 .build();
 
-        mUsersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
+        return notification;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Integer currentIcon = intent.getIntExtra(USER_STATUS_FLAG, R.drawable.home_icon);
+        String userGuid = intent.getStringExtra(USER_GUID_FLAG);
+        mUserReference = FirebaseDatabase.getInstance().getReference()
+                .child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1)
+                .getRef();
         attachDatabaseReadListener();
-
-        startForeground(101, notification);
-
+        startForeground(101, CreateNotification(currentIcon));
         return START_STICKY;
     }
 
-    public void createNewNotification() {
-        Intent showTaskIntent = new Intent(getApplicationContext(), SubscriptionsActivity.class);
-        showTaskIntent.setAction(Intent.ACTION_MAIN);
-        showTaskIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-        showTaskIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-
-        String channelId;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            channelId = createNotificationChannel();
-        else
-            channelId = "";
-
-        PendingIntent contentIntent = PendingIntent.getActivity(
-                getApplicationContext(),
-                0,
-                showTaskIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
-
-        MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(), "cuckoo");
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
-                .setSound(alarmSound)
-                .setSmallIcon(R.drawable.ic_menu_share)
-                .addAction(R.drawable.ic_menu_share, "Share", contentIntent)
-                .setStyle(new android.support.v4.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(0 /* #1: pause button */)
-                        .setMediaSession(mMediaSession.getSessionToken()))
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText("New message")
-                .build();
-
-        startForeground(101, notification);
-
-
-    }
-
     public void AddFirebaseListener(ValueEventListener listener, String guid) {
-        Query query = mUsersDatabaseReference.orderByChild("Guid"); //.equalTo(guid)
+        Query query = mUserReference.orderByChild("Guid"); //.equalTo(guid)
         query.addListenerForSingleValueEvent(listener);
     }
 
