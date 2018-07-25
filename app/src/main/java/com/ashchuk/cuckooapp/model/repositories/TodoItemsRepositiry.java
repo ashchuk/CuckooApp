@@ -22,6 +22,12 @@ public class TodoItemsRepositiry {
                 .debounce(400, TimeUnit.MILLISECONDS);
     }
 
+    public static Observable<TodoItem> getTodoItemById(String todoItemId) {
+        return CuckooApp.getDatabase().todoItemDAO().getTodoItemById(todoItemId)
+                .toObservable()
+                .debounce(400, TimeUnit.MILLISECONDS);
+    }
+
     public static Observable<Integer> insertTodoItem(TodoItem todoItem) {
         return Observable
                 .fromCallable(() -> (int) CuckooApp.getDatabase()

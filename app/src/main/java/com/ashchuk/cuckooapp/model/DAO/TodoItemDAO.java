@@ -19,6 +19,9 @@ public interface TodoItemDAO {
     @Query("SELECT * FROM TodoItem WHERE userId = :userId")
     Single<List<TodoItem>> getTodoItemsByUserId(String userId);
 
+    @Query("SELECT * FROM TodoItem WHERE id = :todoItemId LIMIT 1")
+    Single<TodoItem> getTodoItemById(String todoItemId);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(TodoItem todoItem);
 }

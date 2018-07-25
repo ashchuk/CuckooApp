@@ -7,9 +7,11 @@ import android.support.annotation.NonNull;
 
 import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.Message;
+import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
+import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -27,7 +29,7 @@ public class FirebaseUpdateService extends IntentService {
     private static final String UPDATE_MESSAGE = "com.ashchuk.cuckooapp.services.action.UPDATE_MESSAGE";
     private static final String ADD_TODO = "com.ashchuk.cuckooapp.services.action.ADD_TODO";
     private static final String REMOVE_TODO = "com.ashchuk.cuckooapp.services.action.REMOVE_TODO";
-    private static final String GET_GPS = "com.ashchuk.cuckooapp.services.action.GET_GPS";
+    private static final String MARK_DONE_TODO = "com.ashchuk.cuckooapp.services.action.MARK_DONE_TODO";
     private static final String SET_GPS = "com.ashchuk.cuckooapp.services.action.SET_GPS";
 
     private static final String EXTRA_USER_GUID = "com.ashchuk.cuckooapp.services.extra.USER_GUID";
@@ -96,9 +98,10 @@ public class FirebaseUpdateService extends IntentService {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String todoGuid = intent.getStringExtra(EXTRA_TODO_GUID);
                 handleTodoRemove(userGuid, todoGuid);
-            } else if (GET_GPS.equals(action)) {
+            } else if (MARK_DONE_TODO.equals(action)) {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
-                handleGpsGet(userGuid);
+                String todoGuid = intent.getStringExtra(EXTRA_TODO_GUID);
+                handleTodoDone(userGuid, todoGuid);
             } else if (SET_GPS.equals(action)) {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String gps = intent.getStringExtra(EXTRA_GPS);
@@ -107,7 +110,44 @@ public class FirebaseUpdateService extends IntentService {
         }
     }
 
+    private void handleTodoDone(String userGuid, String todoGuid) {
 
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                for (TodoItem todoItem : entity.Todos) {
+                    if (todoItem.userId.equals(userGuid) && todoItem.id.equals(todoGuid))
+                        todoItem.isDone = true;
+                }
+
+                FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("users")
+                        .child(key)
+                        .setValue(entity);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+    }
 
     private void handleGpsSet(String userGuid, String gps) {
 
@@ -142,13 +182,89 @@ public class FirebaseUpdateService extends IntentService {
 
     }
 
-    private void handleGpsGet(String userGuid) {
-    }
-
     private void handleTodoRemove(String userGuid, String todoGuid) {
+
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                FirebaseUserEntity finalEntity = entity;
+                String finalKey = key;
+                TodoItemsRepositiry.getTodoItemById(todoGuid)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(todoItem -> {
+
+                            finalEntity.Todos.remove(todoItem);
+
+                            FirebaseDatabase.getInstance()
+                                    .getReference()
+                                    .child("users")
+                                    .child(finalKey)
+                                    .setValue(finalEntity);
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     private void handleTodoAdd(String userGuid, String creatorGuid, String todoGuid) {
+
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(userGuid)
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                FirebaseUserEntity finalEntity = entity;
+                String finalKey = key;
+                TodoItemsRepositiry.getTodoItemById(todoGuid)
+                        .subscribeOn(Schedulers.io())
+                        .subscribe(todoItem -> {
+
+                            finalEntity.Todos.add(todoItem);
+
+                            FirebaseDatabase.getInstance()
+                                    .getReference()
+                                    .child("users")
+                                    .child(finalKey)
+                                    .setValue(finalEntity);
+                        });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
 
