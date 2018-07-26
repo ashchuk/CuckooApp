@@ -7,24 +7,32 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class TodoItemsRepositiry {
 
     public static Observable<List<TodoItem>> getTodoItems() {
         return CuckooApp.getDatabase().todoItemDAO().getTodoItems()
                 .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .debounce(400, TimeUnit.MILLISECONDS);
     }
 
     public static Observable<List<TodoItem>> getTodoItemsByUserId(String userId) {
         return CuckooApp.getDatabase().todoItemDAO().getTodoItemsByUserId(userId)
                 .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .debounce(400, TimeUnit.MILLISECONDS);
     }
 
     public static Observable<TodoItem> getTodoItemById(String todoItemId) {
         return CuckooApp.getDatabase().todoItemDAO().getTodoItemById(todoItemId)
                 .toObservable()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .debounce(400, TimeUnit.MILLISECONDS);
     }
 
@@ -32,7 +40,9 @@ public class TodoItemsRepositiry {
         return Observable
                 .fromCallable(() -> (int) CuckooApp.getDatabase()
                         .todoItemDAO()
-                        .insert(todoItem));
+                        .insert(todoItem))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
 }

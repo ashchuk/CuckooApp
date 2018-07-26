@@ -1,5 +1,6 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
+import com.ashchuk.cuckooapp.mvp.viewmodels.UsersViewModel;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
 import com.ashchuk.cuckooapp.services.NotificationService;
@@ -131,6 +133,11 @@ public class SubscriptionsActivity
                 .fabStatusSleep.setOnClickListener(view -> FirebaseUpdateService
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
+
+        UsersViewModel model = ViewModelProviders.of(this).get(UsersViewModel.class);
+        model.getUsers().observe(this, fruitlist -> {
+            Toast.makeText(this, Integer.toString(fruitlist.size()), Toast.LENGTH_SHORT).show();
+        });
 
 //        FirebaseUpdateService.updateUserMessage(this,
 //                FirebaseAuth.getInstance().getCurrentUser().getUid(),
