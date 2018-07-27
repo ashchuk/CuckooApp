@@ -7,13 +7,13 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityToUserConverter;
-import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserToUserConverter;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.mvp.presenters.SearchActivityPresenter;
@@ -21,12 +21,10 @@ import com.ashchuk.cuckooapp.mvp.views.ISearchActivityView;
 import com.ashchuk.cuckooapp.services.NotificationService;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.ashchuk.cuckooapp.ui.adapters.UsersSearchListAdapter;
-import com.google.firebase.auth.FirebaseUser;
+import com.ashchuk.cuckooapp.ui.helpers.SwipeToAddCallback;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -54,6 +52,23 @@ public class SearchActivity
         recyclerView.setAdapter(new UsersSearchListAdapter(testList));
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
+        SwipeToAddCallback handler = new SwipeToAddCallback(0, ItemTouchHelper.LEFT) {
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                UsersSearchListAdapter adapter = (UsersSearchListAdapter)
+                        recyclerView.getAdapter();
+                searchActivityPresenter.InsertSubscriptionIntoDb(SearchActivity.this,
+                        adapter.createSubscription(viewHolder.getAdapterPosition()));
+                adapter.removeAt(viewHolder.getAdapterPosition());
+                super.onSwiped(viewHolder, direction);
+            }
+        };
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(handler);
+        itemTouchHelper
+                .attachToRecyclerView(recyclerView);
+
+
         ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -61,11 +76,17 @@ public class SearchActivity
                     testList.clear();
                     for (DataSnapshot user : dataSnapshot.getChildren()) {
                         FirebaseUserEntity result = user.getValue(FirebaseUserEntity.class);
-                        testList.add(FirebaseUserEntityToUserConverter
-                                .convert(Objects.requireNonNull(result)));
+
+                        if (result == null)
+                            continue;
+
+                        if (!result.Guid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                            testList.add(FirebaseUserEntityToUserConverter
+                                    .convert(Objects.requireNonNull(result)));
                     }
                     Toast.makeText(SearchActivity.this, "TestList count == " + testList.size(), Toast.LENGTH_SHORT).show();
                     UsersSearchListAdapter adapter = (UsersSearchListAdapter) recyclerView.getAdapter();
+
                     adapter.UpdateList(testList);
                 }
             }

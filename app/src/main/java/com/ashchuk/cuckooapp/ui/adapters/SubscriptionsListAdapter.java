@@ -50,4 +50,8 @@ public class SubscriptionsListAdapter extends RecyclerView.Adapter<Subscriptions
         subscriptions.remove(position);
         notifyItemRemoved(position);
     }
+
+    public Subscription getSubscription(int position) {
+        return subscriptions.get(position);
+    }
 }

@@ -110,6 +110,14 @@ public class FirebaseUpdateService extends IntentService {
         context.startService(intent);
     }
 
+    public static void addUserSubsription(Context context, String subscriptionGuid, String guid) {
+        Intent intent = new Intent(context, FirebaseUpdateService.class);
+        intent.setAction(ADD_SUBSCRIPTION);
+        intent.putExtra(EXTRA_USER_GUID, guid);
+        intent.putExtra(EXTRA_SUBSCRIPTION_GUID, subscriptionGuid);
+        context.startService(intent);
+    }
+
     private void handleTodoDone(String userGuid, String todoGuid) {
 
         FirebaseDatabase.getInstance()

@@ -8,10 +8,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.ashchuk.cuckooapp.R;
+import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.entities.User;
+import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.ui.viewholders.TodoItemViewHolder;
 
+import java.util.Date;
 import java.util.List;
 
 public class UsersSearchListAdapter extends RecyclerView.Adapter<TodoItemViewHolder> {
@@ -42,6 +45,23 @@ public class UsersSearchListAdapter extends RecyclerView.Adapter<TodoItemViewHol
     @Override
     public int getItemCount() {
         return users.size();
+    }
+
+    public void removeAt(int position) {
+        users.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public Subscription createSubscription(int position) {
+        User user = users.get(position);
+        Subscription subscription = new Subscription();
+
+        subscription.userId = user.Guid;
+        subscription.status = UserStatus.HOME.getValue();
+        subscription.lastUpdatedDate = new Date();
+        subscription.id = java.util.UUID.randomUUID().toString();
+
+        return subscription;
     }
 
     public void UpdateList(List<User> users) {
