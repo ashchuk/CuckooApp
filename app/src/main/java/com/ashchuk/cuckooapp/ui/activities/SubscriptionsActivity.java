@@ -91,23 +91,6 @@ public class SubscriptionsActivity
                 .subscriptionsList
                 .setLayoutManager(new LinearLayoutManager(SubscriptionsActivity.this));
 
-        SwipeToDeleteCallback handler = new SwipeToDeleteCallback(0, ItemTouchHelper.LEFT) {
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                SubscriptionsListAdapter adapter = (SubscriptionsListAdapter)
-                        binding.includeAppBarSubscriptions
-                                .includeContentSubscriptions
-                                .subscriptionsList.getAdapter();
-                adapter.removeAt(viewHolder.getAdapterPosition());
-                super.onSwiped(viewHolder, direction);
-            }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(handler);
-        itemTouchHelper
-                .attachToRecyclerView(binding.includeAppBarSubscriptions
-                        .includeContentSubscriptions
-                        .subscriptionsList);
 
         binding.includeAppBarSubscriptions
                 .fabStatusHome.setOnClickListener(view -> FirebaseUpdateService
@@ -135,9 +118,10 @@ public class SubscriptionsActivity
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
         UsersViewModel model = ViewModelProviders.of(this).get(UsersViewModel.class);
-        model.getUsers().observe(this, fruitlist -> {
-            Toast.makeText(this, Integer.toString(fruitlist.size()), Toast.LENGTH_SHORT).show();
-        });
+        model.getUsers().observe(this, users ->
+                Toast.makeText(this, Integer
+                                .toString(users.size()),
+                        Toast.LENGTH_SHORT).show());
 
 //        FirebaseUpdateService.updateUserMessage(this,
 //                FirebaseAuth.getInstance().getCurrentUser().getUid(),

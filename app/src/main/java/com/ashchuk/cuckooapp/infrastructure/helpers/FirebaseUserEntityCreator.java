@@ -55,6 +55,7 @@ public class FirebaseUserEntityCreator {
                     entity.DisplayName = user.DisplayName;
                     entity.Status = user.Status == null ? UserStatus.HOME.getValue() : user.Status.getValue();
                     entity.Gps = "123123;321321";
+                    entity.LastUpdateDate = user.LastUpdateDate;
 
                     TodoItem todoItem = new TodoItem();
                     todoItem.creationDate = new Date();
@@ -72,7 +73,7 @@ public class FirebaseUserEntityCreator {
 
                     Subscription subscription = new Subscription();
                     subscription.id = java.util.UUID.randomUUID().toString();
-                    subscription.lastUpdatedDate = new Date();
+                    subscription.lastUpdateDate = new Date();
                     subscription.status = UserStatus.DRIVE.getValue();
                     subscription.userId = user.Guid;
 

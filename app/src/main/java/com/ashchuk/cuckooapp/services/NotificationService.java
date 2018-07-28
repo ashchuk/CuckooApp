@@ -179,11 +179,6 @@ public class NotificationService extends Service {
         return START_STICKY;
     }
 
-    public void AddFirebaseListener(ValueEventListener listener, String guid) {
-        Query query = mUserReference.orderByChild("Guid"); //.equalTo(guid)
-        query.addListenerForSingleValueEvent(listener);
-    }
-
     @RequiresApi(Build.VERSION_CODES.O)
     private String createNotificationChannel() {
         String channelId = "CuckooApp";

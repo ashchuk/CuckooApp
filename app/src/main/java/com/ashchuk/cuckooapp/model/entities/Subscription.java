@@ -4,8 +4,6 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
-import com.ashchuk.cuckooapp.model.enums.UserStatus;
-
 import java.util.Date;
 
 @Entity
@@ -15,5 +13,5 @@ public class Subscription {
     public String id;
     public String userId;
     public Integer status;
-    public Date lastUpdatedDate;
+    public Date lastUpdateDate;
 }

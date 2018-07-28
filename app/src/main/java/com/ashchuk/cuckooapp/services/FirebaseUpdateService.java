@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -110,10 +111,11 @@ public class FirebaseUpdateService extends IntentService {
         context.startService(intent);
     }
 
-    public static void addUserSubsription(Context context, String subscriptionGuid, String guid) {
+    public static void addUserSubscription(Context context, String subscriptionGuid,
+                                           String currentUserGuid) {
         Intent intent = new Intent(context, FirebaseUpdateService.class);
         intent.setAction(ADD_SUBSCRIPTION);
-        intent.putExtra(EXTRA_USER_GUID, guid);
+        intent.putExtra(EXTRA_USER_GUID, currentUserGuid);
         intent.putExtra(EXTRA_SUBSCRIPTION_GUID, subscriptionGuid);
         context.startService(intent);
     }
@@ -405,20 +407,24 @@ public class FirebaseUpdateService extends IntentService {
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
                 String key = null;
                 for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                     key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
                 }
 
-                if (key == null)
+                if (entity == null || key == null)
                     return;
 
-                Map<String, Object> childUpdates = new HashMap<>();
-                childUpdates.put("users/" + key + "/Status", userStatus.getValue());
+                entity.LastUpdateDate = new Date();
+                entity.Status = userStatus.getValue();
 
                 FirebaseDatabase.getInstance()
                         .getReference()
-                        .updateChildren(childUpdates);
+                        .child("users")
+                        .child(key)
+                        .setValue(entity);
             }
 
             @Override

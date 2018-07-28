@@ -9,7 +9,6 @@ import android.widget.TextView;
 
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
-import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.ui.viewholders.TodoItemViewHolder;
@@ -58,7 +57,7 @@ public class UsersSearchListAdapter extends RecyclerView.Adapter<TodoItemViewHol
 
         subscription.userId = user.Guid;
         subscription.status = UserStatus.HOME.getValue();
-        subscription.lastUpdatedDate = new Date();
+        subscription.lastUpdateDate = new Date();
         subscription.id = java.util.UUID.randomUUID().toString();
 
         return subscription;

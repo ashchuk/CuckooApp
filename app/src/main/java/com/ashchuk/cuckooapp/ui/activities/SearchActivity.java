@@ -18,6 +18,7 @@ import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.mvp.presenters.SearchActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISearchActivityView;
+import com.ashchuk.cuckooapp.services.FirebaseQueryService;
 import com.ashchuk.cuckooapp.services.NotificationService;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.ashchuk.cuckooapp.ui.adapters.UsersSearchListAdapter;
@@ -38,7 +39,7 @@ public class SearchActivity
     @InjectPresenter
     SearchActivityPresenter searchActivityPresenter;
 
-    private NotificationService notificationService;
+    private FirebaseQueryService queryService;
     private ServiceConnection serviceConnection;
 
     private List<User> testList = new ArrayList<>();
@@ -99,8 +100,8 @@ public class SearchActivity
 
         serviceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName name, IBinder binder) {
-                notificationService = ((NotificationService.NotificationServiceBinder) binder).getService();
-                notificationService.AddFirebaseListener(listener, "guid");
+                queryService = ((FirebaseQueryService.FirebaseQueryServiceBinder) binder).getService();
+                queryService.AddGetAllUsersListener(listener);
             }
 
             public void onServiceDisconnected(ComponentName name) {
@@ -119,7 +120,8 @@ public class SearchActivity
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, NotificationService.class);
+        Intent intent = new Intent(this, FirebaseQueryService.class);
+        startService(intent);
         bindService(intent, serviceConnection, 0);
     }
 }

@@ -4,6 +4,7 @@ import com.ashchuk.cuckooapp.model.entities.Message;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
 
+import java.util.Date;
 import java.util.List;
 
 public class FirebaseUserEntity {
@@ -13,6 +14,7 @@ public class FirebaseUserEntity {
     public Integer Status;
     public String PhoneNumber;
     public String Gps;
+    public Date LastUpdateDate;
     public List<TodoItem> Todos;
     public List<Subscription> Subscriptions;
     public List<Message> Messages;
