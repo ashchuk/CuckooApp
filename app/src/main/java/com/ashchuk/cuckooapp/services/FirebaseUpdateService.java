@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -302,6 +303,9 @@ public class FirebaseUpdateService extends IntentService {
                         .subscribeOn(Schedulers.io())
                         .subscribe(subscription -> {
 
+                            if (finalEntity.Subscriptions == null)
+                                finalEntity.Subscriptions = new ArrayList<>();
+
                             finalEntity.Subscriptions.add(subscription);
 
                             FirebaseDatabase.getInstance()
@@ -344,7 +348,8 @@ public class FirebaseUpdateService extends IntentService {
                         .subscribeOn(Schedulers.io())
                         .subscribe(subscription -> {
 
-                            finalEntity.Subscriptions.remove(subscription);
+                            if (finalEntity.Subscriptions != null)
+                                finalEntity.Subscriptions.remove(subscription);
 
                             FirebaseDatabase.getInstance()
                                     .getReference()

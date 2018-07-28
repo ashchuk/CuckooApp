@@ -24,4 +24,7 @@ public interface TodoItemDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(TodoItem todoItem);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    List<Long>  insertList(List<TodoItem> todoItems);
 }

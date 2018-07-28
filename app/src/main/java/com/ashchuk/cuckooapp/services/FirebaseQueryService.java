@@ -60,12 +60,12 @@ public class FirebaseQueryService extends Service {
     }
 
     public void AddGetUserByGuidListener(ValueEventListener listener, String guid) {
-        Query query = mUsersDatabaseReference.orderByChild("Guid").equalTo(guid);
+        Query query = mUsersDatabaseReference.orderByChild("Guid").equalTo(guid).limitToFirst(1);
         query.addListenerForSingleValueEvent(listener);
     }
 
     public void AddGetUserByEmailListener(ValueEventListener listener, String email) {
-        Query query = mUsersDatabaseReference.orderByChild("Email").equalTo(email);
+        Query query = mUsersDatabaseReference.orderByChild("Email").equalTo(email).limitToFirst(1);
         query.addListenerForSingleValueEvent(listener);
     }
 

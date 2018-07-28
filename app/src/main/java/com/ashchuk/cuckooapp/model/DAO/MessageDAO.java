@@ -20,5 +20,8 @@ public interface MessageDAO {
     Single<List<Message>> getMessagesByUserId(String userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    long insert (Message message);
+    long insert(Message message);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    List<Long> insertList(List<Message> message);
 }

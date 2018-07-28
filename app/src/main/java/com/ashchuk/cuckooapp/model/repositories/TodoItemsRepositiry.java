@@ -3,6 +3,7 @@ package com.ashchuk.cuckooapp.model.repositories;
 import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -41,6 +42,16 @@ public class TodoItemsRepositiry {
                 .fromCallable(() -> (int) CuckooApp.getDatabase()
                         .todoItemDAO()
                         .insert(todoItem))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+
+    public static Observable<List<Long>> insertTodoItems(List<TodoItem> todoItems) {
+        return Observable
+                .fromCallable(() -> CuckooApp.getDatabase()
+                        .todoItemDAO()
+                        .insertList(todoItems == null ? new ArrayList<>() : todoItems))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

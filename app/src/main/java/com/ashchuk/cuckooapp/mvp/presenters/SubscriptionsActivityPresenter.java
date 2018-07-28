@@ -7,11 +7,18 @@ import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityCreator;
 import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserToUserConverter;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
+import com.ashchuk.cuckooapp.model.repositories.MessagesRepository;
+import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
+import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
+import com.ashchuk.cuckooapp.services.FirebaseQueryService;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,25 +32,52 @@ public class SubscriptionsActivityPresenter extends MvpPresenter<ISubscriptionsA
         getViewState().CheckAuth();
     }
 
-    public static User InsertUserIntoDb(FirebaseUser firebaseUser) {
+    public User InsertUserIntoDb(FirebaseUser firebaseUser) {
         User user = FirebaseUserToUserConverter
                 .convert(firebaseUser);
 
         UserRepository.insertUser(user)
-                .switchMap(data -> UpdateFirebaseUser())
                 .subscribeOn(Schedulers.io())
-                .subscribe((userEntity) -> FirebaseDatabase.getInstance()
-                        .getReference().child("users")
-                        .push().setValue(userEntity));
+                .subscribe();
 
         return user;
     }
 
-    public static Observable<FirebaseUserEntity> UpdateFirebaseUser() {
+    public Observable<FirebaseUserEntity> GetFirebaseUser() {
 //        return FirebaseUserEntityCreator
 //                .create(FirebaseAuth.getInstance().getCurrentUser().getUid());
         return FirebaseUserEntityCreator
                 .createDummy(FirebaseAuth.getInstance().getCurrentUser().getUid());
+    }
+
+    public void syncUserData(String userGuid, FirebaseQueryService queryService) {
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                Observable.concat(SubscriptionsRepository.insertSubscriptions(entity.Subscriptions),
+                        MessagesRepository.insertMessages(entity.Messages),
+                        TodoItemsRepositiry.insertTodoItems(entity.Todos))
+                        .subscribeOn(Schedulers.io())
+                        .subscribe((result) -> getViewState().fillSubscriptionsList());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        queryService.AddGetUserByGuidListener(listener, userGuid);
     }
 
 }

@@ -30,7 +30,9 @@ public class FirebaseUserEntityCreator {
                     entity.Email = user.Email;
                     entity.PhoneNumber = user.PhoneNumber;
                     entity.DisplayName = user.DisplayName;
+                    entity.Gps = "123123;321321";
                     entity.Status = user.Status == null ? UserStatus.HOME.getValue() : user.Status.getValue();
+                    entity.LastUpdateDate = user.LastUpdateDate;
 
                     entity.Todos = todoItems;
                     entity.Messages = messages;
@@ -71,15 +73,9 @@ public class FirebaseUserEntityCreator {
                     message.creatorId = user.Guid;
                     message.userId = user.Guid;
 
-                    Subscription subscription = new Subscription();
-                    subscription.id = java.util.UUID.randomUUID().toString();
-                    subscription.lastUpdateDate = new Date();
-                    subscription.status = UserStatus.DRIVE.getValue();
-                    subscription.userId = user.Guid;
-
                     entity.Todos = new ArrayList<>(Arrays.asList(todoItem,todoItem));
                     entity.Messages = new ArrayList<>(Arrays.asList(message, message));
-                    entity.Subscriptions = new ArrayList<>(Arrays.asList(subscription, subscription));
+                    entity.Subscriptions = new ArrayList<>(Arrays.asList());
 
                     return entity;
                 });

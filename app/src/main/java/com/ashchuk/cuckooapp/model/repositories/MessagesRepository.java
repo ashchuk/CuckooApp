@@ -3,6 +3,7 @@ package com.ashchuk.cuckooapp.model.repositories;
 import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.Message;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -33,6 +34,15 @@ public class MessagesRepository {
                 .fromCallable(() -> (int) CuckooApp.getDatabase()
                         .messageDAO()
                         .insert(message))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static Observable<List<Long>> insertMessages(List<Message> messages) {
+        return Observable
+                .fromCallable(() -> CuckooApp.getDatabase()
+                        .messageDAO()
+                        .insertList(messages == null ? new ArrayList<>() : messages))
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }

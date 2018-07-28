@@ -1,9 +1,12 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -12,6 +15,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -20,25 +24,35 @@ import com.arellomobile.mvp.presenter.InjectPresenter;
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.databinding.ActivitySubscriptionsBinding;
 import com.ashchuk.cuckooapp.databinding.ContentSubscriptionsBinding;
+import com.ashchuk.cuckooapp.infrastructure.helpers.FirebaseUserEntityToUserConverter;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
+import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.mvp.presenters.SubscriptionsActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.viewmodels.UsersViewModel;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
+import com.ashchuk.cuckooapp.services.FirebaseQueryService;
 import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
 import com.ashchuk.cuckooapp.services.NotificationService;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
+import com.ashchuk.cuckooapp.ui.adapters.UsersSearchListAdapter;
 import com.ashchuk.cuckooapp.ui.helpers.SwipeToDeleteCallback;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
@@ -53,15 +67,20 @@ public class SubscriptionsActivity
     @InjectPresenter
     SubscriptionsActivityPresenter subscriptionsActivityPresenter;
 
+    private FirebaseQueryService queryService;
+    private ServiceConnection serviceConnection;
+
     public static final int RC_SIGN_IN = 1;
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
 
+    private ActivitySubscriptionsBinding binding;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivitySubscriptionsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_subscriptions);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_subscriptions);
 
         setSupportActionBar(binding.includeAppBarSubscriptions.toolbar);
 
@@ -74,15 +93,9 @@ public class SubscriptionsActivity
 
         binding.navView.setNavigationItemSelectedListener(this);
 
-        List<Subscription> list = new ArrayList<>(Arrays
-                .asList(new Subscription(), new Subscription(), new Subscription(),
-                        new Subscription(), new Subscription(), new Subscription(),
-                        new Subscription(), new Subscription(), new Subscription(),
-                        new Subscription(), new Subscription(), new Subscription()));
-
         binding.includeAppBarSubscriptions
                 .includeContentSubscriptions
-                .subscriptionsList.setAdapter(new SubscriptionsListAdapter(list,
+                .subscriptionsList.setAdapter(new SubscriptionsListAdapter(new ArrayList<>(),
                 (v, subscription) -> {
                 }));
 
@@ -117,17 +130,28 @@ public class SubscriptionsActivity
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-        UsersViewModel model = ViewModelProviders.of(this).get(UsersViewModel.class);
-        model.getUsers().observe(this, users ->
-                Toast.makeText(this, Integer
-                                .toString(users.size()),
-                        Toast.LENGTH_SHORT).show());
+        serviceConnection = new ServiceConnection() {
+            public void onServiceConnected(ComponentName name, IBinder binder) {
+                queryService = ((FirebaseQueryService.FirebaseQueryServiceBinder) binder).getService();
+            }
 
-//        FirebaseUpdateService.updateUserMessage(this,
-//                FirebaseAuth.getInstance().getCurrentUser().getUid(),
-//                FirebaseAuth.getInstance().getCurrentUser().getUid(),
-//                "8160fd9f-a3e8-4eb5-b78c-58dde56b2793",
-//                "wololo");
+            public void onServiceDisconnected(ComponentName name) {
+            }
+        };
+    }
+
+    @Override
+    public void fillSubscriptionsList() {
+        UsersViewModel model = ViewModelProviders.of(this).get(UsersViewModel.class);
+        model.getUserSubscriptions(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .observe(this, subscriptions -> {
+                    SubscriptionsListAdapter adapter =
+                            (SubscriptionsListAdapter) binding.includeAppBarSubscriptions
+                                    .includeContentSubscriptions
+                                    .subscriptionsList.getAdapter();
+                    adapter.updateSubscriptions(subscriptions);
+                }
+        );
     }
 
     @Override
@@ -145,13 +169,30 @@ public class SubscriptionsActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        unbindService(serviceConnection);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(this, FirebaseQueryService.class);
+        startService(intent);
+        bindService(intent, serviceConnection, 0);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
 
-                User user = SubscriptionsActivityPresenter
+                User user = subscriptionsActivityPresenter
                         .InsertUserIntoDb(FirebaseAuth.getInstance().getCurrentUser());
+
+                checkFirebaseUserExists(user);
+                fillSubscriptionsList();
 
                 Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
@@ -159,6 +200,31 @@ public class SubscriptionsActivity
                 finish();
             }
         }
+    }
+
+    private void checkFirebaseUserExists(User user) {
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists())
+                    return;
+
+                subscriptionsActivityPresenter.GetFirebaseUser()
+                        .observeOn(Schedulers.io())
+                        .subscribeOn(AndroidSchedulers.mainThread())
+                        .subscribe(firebaseUserEntity -> FirebaseDatabase.getInstance()
+                                .getReference().child("users")
+                                .push().setValue(firebaseUserEntity));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        queryService.AddGetUserByGuidListener(listener, user.Guid);
     }
 
     @Override
@@ -193,6 +259,29 @@ public class SubscriptionsActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.subscriptions, menu);
+
+//        MenuItem searchItem = menu.findItem(R.id.action_search);
+//        SearchView searchView =
+//                (SearchView) searchItem.getActionView();
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.sync:
+                subscriptionsActivityPresenter
+                        .syncUserData(FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                                queryService);
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override

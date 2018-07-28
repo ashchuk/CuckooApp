@@ -16,7 +16,7 @@ public interface SubscriptionDAO {
     @Query("SELECT * FROM Subscription")
     Single<List<Subscription>> getSubscriptions();
 
-    @Query("SELECT * FROM Subscription WHERE userId = :userId")
+    @Query("SELECT * FROM Subscription WHERE subscriberId = :userId")
     Single<List<Subscription>> getSubscriptionsByUserId(String userId);
 
     @Query("SELECT * FROM Subscription WHERE id = :subscriptionId LIMIT 1")
@@ -24,4 +24,7 @@ public interface SubscriptionDAO {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(Subscription subscription);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    List<Long>  insertList(List<Subscription> subscriptions);
 }

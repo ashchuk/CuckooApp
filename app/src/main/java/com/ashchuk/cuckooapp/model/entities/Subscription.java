@@ -11,7 +11,9 @@ public class Subscription {
     @PrimaryKey
     @NonNull
     public String id;
+    public String DisplayName;
     public String userId;
+    public String subscriberId;
     public Integer status;
     public Date lastUpdateDate;
 }

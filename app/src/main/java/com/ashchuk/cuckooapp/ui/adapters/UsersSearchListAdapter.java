@@ -12,6 +12,7 @@ import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.ui.viewholders.TodoItemViewHolder;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Date;
 import java.util.List;
@@ -56,9 +57,11 @@ public class UsersSearchListAdapter extends RecyclerView.Adapter<TodoItemViewHol
         Subscription subscription = new Subscription();
 
         subscription.userId = user.Guid;
+        subscription.subscriberId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         subscription.status = UserStatus.HOME.getValue();
         subscription.lastUpdateDate = new Date();
         subscription.id = java.util.UUID.randomUUID().toString();
+        subscription.DisplayName = user.DisplayName;
 
         return subscription;
     }
