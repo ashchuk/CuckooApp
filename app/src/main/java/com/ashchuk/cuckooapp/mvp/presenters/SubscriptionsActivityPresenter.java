@@ -1,5 +1,7 @@
 package com.ashchuk.cuckooapp.mvp.presenters;
 
+import android.arch.lifecycle.ViewModelProviders;
+
 import com.arellomobile.mvp.InjectViewState;
 import com.arellomobile.mvp.MvpPresenter;
 import com.ashchuk.cuckooapp.CuckooApp;
@@ -11,8 +13,10 @@ import com.ashchuk.cuckooapp.model.repositories.MessagesRepository;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
+import com.ashchuk.cuckooapp.mvp.viewmodels.UsersViewModel;
 import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.FirebaseQueryService;
+import com.ashchuk.cuckooapp.ui.activities.SubscriptionsActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -68,7 +72,7 @@ public class SubscriptionsActivityPresenter extends MvpPresenter<ISubscriptionsA
                         MessagesRepository.insertMessages(entity.Messages),
                         TodoItemsRepositiry.insertTodoItems(entity.Todos))
                         .subscribeOn(Schedulers.io())
-                        .subscribe((result) -> getViewState().fillSubscriptionsList());
+                        .subscribe((result) -> getViewState().fillSubscriptionsList(true));
             }
 
             @Override

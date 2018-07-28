@@ -4,5 +4,5 @@ import com.arellomobile.mvp.MvpView;
 
 public interface ISubscriptionsActivityView extends MvpView {
     void CheckAuth();
-    void fillSubscriptionsList();
+    void fillSubscriptionsList(boolean cleanup);
 }

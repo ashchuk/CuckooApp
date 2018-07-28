@@ -141,8 +141,12 @@ public class SubscriptionsActivity
     }
 
     @Override
-    public void fillSubscriptionsList() {
+    public void fillSubscriptionsList(boolean cleanup) {
         UsersViewModel model = ViewModelProviders.of(this).get(UsersViewModel.class);
+
+        if (cleanup)
+            model.cleanDataset();
+
         model.getUserSubscriptions(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .observe(this, subscriptions -> {
                     SubscriptionsListAdapter adapter =
@@ -192,7 +196,7 @@ public class SubscriptionsActivity
                         .InsertUserIntoDb(FirebaseAuth.getInstance().getCurrentUser());
 
                 checkFirebaseUserExists(user);
-                fillSubscriptionsList();
+                fillSubscriptionsList(false);
 
                 Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {

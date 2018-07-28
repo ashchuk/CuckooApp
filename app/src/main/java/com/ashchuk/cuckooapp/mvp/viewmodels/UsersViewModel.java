@@ -13,21 +13,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.List;
 
 public class UsersViewModel extends ViewModel {
-    private MutableLiveData<List<User>> users;
     private MutableLiveData<List<Subscription>> subscriptions;
 
-    public LiveData<List<User>> getUsers() {
-        if (users == null) {
-            users = new MutableLiveData<>();
-            loadUsers();
-        }
-
-        return users;
-    }
-
-    private void loadUsers() {
-        UserRepository.getUsers()
-                .subscribe(result -> users.setValue(result));
+    public void cleanDataset(){
+        subscriptions = null;
     }
 
     public LiveData<List<Subscription>> getUserSubscriptions(String userGuid) {
