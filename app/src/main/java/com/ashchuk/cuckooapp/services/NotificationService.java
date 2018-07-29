@@ -17,6 +17,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import com.ashchuk.cuckooapp.R;
+import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,6 +28,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.Date;
 
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_GUID_FLAG;
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
@@ -51,6 +54,12 @@ public class NotificationService extends Service {
                 public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                     FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
 
+                    if (user == null)
+                        return;
+
+                    if (!user.Guid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
+                        return;
+
                     Integer icon = R.drawable.home_icon;
 
                     if (UserStatus.valueOf(user.Status) == UserStatus.HOME) {
@@ -73,23 +82,32 @@ public class NotificationService extends Service {
                 public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                     FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
 
-                    Integer icon = R.drawable.home_icon;
+                    if (user == null)
+                        return;
 
-                    if (UserStatus.valueOf(user.Status) == UserStatus.HOME) {
-                        icon = R.drawable.home_icon;
-                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WORK) {
-                        icon = R.drawable.work_icon;
-                    } else if (UserStatus.valueOf(user.Status) == UserStatus.LUNCH) {
-                        icon = R.drawable.food_icon;
-                    } else if (UserStatus.valueOf(user.Status) == UserStatus.DRIVE) {
-                        icon = R.drawable.car_icon;
-                    } else if (UserStatus.valueOf(user.Status) == UserStatus.WALK) {
-                        icon = R.drawable.walk_icon;
-                    } else if (UserStatus.valueOf(user.Status) == UserStatus.SLEEP) {
-                        icon = R.drawable.sleep_icon;
+                    if (user.Guid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())) {
+
+                        Integer icon = R.drawable.home_icon;
+
+                        if (UserStatus.valueOf(user.Status) == UserStatus.HOME) {
+                            icon = R.drawable.home_icon;
+                        } else if (UserStatus.valueOf(user.Status) == UserStatus.WORK) {
+                            icon = R.drawable.work_icon;
+                        } else if (UserStatus.valueOf(user.Status) == UserStatus.LUNCH) {
+                            icon = R.drawable.food_icon;
+                        } else if (UserStatus.valueOf(user.Status) == UserStatus.DRIVE) {
+                            icon = R.drawable.car_icon;
+                        } else if (UserStatus.valueOf(user.Status) == UserStatus.WALK) {
+                            icon = R.drawable.walk_icon;
+                        } else if (UserStatus.valueOf(user.Status) == UserStatus.SLEEP) {
+                            icon = R.drawable.sleep_icon;
+                        }
+
+                        startForeground(101, CreateNotification(icon));
+                    } else{
+                        FirebaseUpdateService.updateUserSubscription(getApplicationContext(),
+                                user.Guid, user.Status, user.LastUpdateDate.toString());
                     }
-
-                    startForeground(101, CreateNotification(icon));
                 }
 
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
@@ -167,13 +185,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Integer currentIcon = intent.getIntExtra(USER_STATUS_FLAG, R.drawable.home_icon);
-        String userGuid = intent.getStringExtra(USER_GUID_FLAG);
-        mUserReference = FirebaseDatabase.getInstance().getReference()
-                .child("users")
-                .orderByChild("Guid")
-                .equalTo(userGuid)
-                .limitToFirst(1)
-                .getRef();
+        mUserReference = FirebaseDatabase.getInstance().getReference().child("users");
         attachDatabaseReadListener();
         startForeground(101, CreateNotification(currentIcon));
         return START_STICKY;

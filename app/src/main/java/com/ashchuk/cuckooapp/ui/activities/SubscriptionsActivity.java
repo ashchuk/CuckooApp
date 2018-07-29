@@ -1,13 +1,17 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,6 +25,7 @@ import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
 import com.arellomobile.mvp.presenter.InjectPresenter;
+import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.databinding.ActivitySubscriptionsBinding;
 import com.ashchuk.cuckooapp.databinding.ContentSubscriptionsBinding;
@@ -74,6 +79,13 @@ public class SubscriptionsActivity
 
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            fillSubscriptionsList(true);
+        }
+    };
 
     private ActivitySubscriptionsBinding binding;
 
@@ -130,6 +142,9 @@ public class SubscriptionsActivity
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
+        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+            fillSubscriptionsList(true);
+
         serviceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName name, IBinder binder) {
                 queryService = ((FirebaseQueryService.FirebaseQueryServiceBinder) binder).getService();
@@ -149,19 +164,22 @@ public class SubscriptionsActivity
 
         model.getUserSubscriptions(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .observe(this, subscriptions -> {
-                    SubscriptionsListAdapter adapter =
-                            (SubscriptionsListAdapter) binding.includeAppBarSubscriptions
-                                    .includeContentSubscriptions
-                                    .subscriptionsList.getAdapter();
-                    adapter.updateSubscriptions(subscriptions);
-                }
-        );
+                            SubscriptionsListAdapter adapter =
+                                    (SubscriptionsListAdapter) binding.includeAppBarSubscriptions
+                                            .includeContentSubscriptions
+                                            .subscriptionsList.getAdapter();
+                            adapter.updateSubscriptions(subscriptions);
+                        }
+                );
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+        LocalBroadcastManager.getInstance(CuckooApp.getAppComponent().getContext())
+                .registerReceiver(mMessageReceiver,
+                        new IntentFilter("update"));
     }
 
     @Override
@@ -170,6 +188,8 @@ public class SubscriptionsActivity
         if (mAuthStateListener != null) {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
+        LocalBroadcastManager.getInstance(this)
+                .unregisterReceiver(mMessageReceiver);
     }
 
     @Override

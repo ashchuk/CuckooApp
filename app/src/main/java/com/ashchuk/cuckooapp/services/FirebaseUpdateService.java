@@ -2,21 +2,29 @@ package com.ashchuk.cuckooapp.services;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
+import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.Message;
+import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
+import com.ashchuk.cuckooapp.mvp.viewmodels.UsersViewModel;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +35,7 @@ import io.reactivex.schedulers.Schedulers;
 public class FirebaseUpdateService extends IntentService {
     private static final String UPDATE_STATUS = "com.ashchuk.cuckooapp.services.action.UPDATE_STATUS";
     private static final String ADD_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.ADD_SUBSCRIPTION";
+    private static final String UPDATE_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.UPDATE_SUBSCRIPTION";
     private static final String REMOVE_SUBSCRIPTION = "com.ashchuk.cuckooapp.services.action.REMOVE_SUBSCRIPTION";
     private static final String UPDATE_MESSAGE = "com.ashchuk.cuckooapp.services.action.UPDATE_MESSAGE";
     private static final String ADD_TODO = "com.ashchuk.cuckooapp.services.action.ADD_TODO";
@@ -42,6 +51,7 @@ public class FirebaseUpdateService extends IntentService {
     private static final String EXTRA_SUBSCRIPTION_GUID = "com.ashchuk.cuckooapp.services.extra.SUBSCRIPTION_GUID";
     private static final String EXTRA_STATUS = "com.ashchuk.cuckooapp.services.extra.STATUS";
     private static final String EXTRA_GPS = "com.ashchuk.cuckooapp.services.extra.GPS";
+    private static final String EXTRA_DATE = "com.ashchuk.cuckooapp.services.extra.EXTRA_DATE";
 
 
     public FirebaseUpdateService() {
@@ -65,6 +75,11 @@ public class FirebaseUpdateService extends IntentService {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String subscriptionGuid = intent.getStringExtra(EXTRA_SUBSCRIPTION_GUID);
                 handleSubscriptionRemove(userGuid, subscriptionGuid);
+            } else if (UPDATE_SUBSCRIPTION.equals(action)) {
+                Date updateDate = new Date(intent.getStringExtra(EXTRA_DATE));
+                String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
+                Integer status = intent.getIntExtra(EXTRA_STATUS, 1);
+                handleSubscriptionUpdate(userGuid, status, updateDate);
             } else if (UPDATE_MESSAGE.equals(action)) {
                 String userGuid = intent.getStringExtra(EXTRA_USER_GUID);
                 String creatorGuid = intent.getStringExtra(EXTRA_CREATOR_GUID);
@@ -121,6 +136,66 @@ public class FirebaseUpdateService extends IntentService {
         context.startService(intent);
     }
 
+
+    public static void updateUserSubscription(Context context, String userGuid, Integer userStatus,
+                                              String updateDate) {
+        Intent intent = new Intent(context, FirebaseUpdateService.class);
+        intent.setAction(UPDATE_SUBSCRIPTION);
+        intent.putExtra(EXTRA_USER_GUID, userGuid);
+        intent.putExtra(EXTRA_STATUS, userStatus);
+        intent.putExtra(EXTRA_DATE, updateDate);
+        context.startService(intent);
+    }
+
+    private void handleSubscriptionUpdate(String userGuid, Integer status, Date updateDate) {
+
+        FirebaseDatabase.getInstance()
+                .getReference().child("users")
+                .orderByChild("Guid")
+                .equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                FirebaseUserEntity entity = null;
+                String key = null;
+                for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                    key = childSnapshot.getKey();
+                    entity = childSnapshot.getValue(FirebaseUserEntity.class);
+                }
+
+                if (entity == null || key == null)
+                    return;
+
+                if (entity.Subscriptions == null)
+                    entity.Subscriptions = new ArrayList<>();
+
+                for (Subscription subscription : entity.Subscriptions) {
+                    if (subscription.userId.equals(userGuid)) {
+                        subscription.lastUpdateDate = updateDate;
+                        subscription.status = status;
+                        SubscriptionsRepository.insertSubscription(subscription).subscribe();
+
+                        Intent intent = new Intent("update");
+                        LocalBroadcastManager.getInstance(CuckooApp.getAppComponent().getContext())
+                                .sendBroadcast(intent);
+                    }
+                }
+
+                FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child("users")
+                        .child(key)
+                        .setValue(entity);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
     private void handleTodoDone(String userGuid, String todoGuid) {
 
         FirebaseDatabase.getInstance()
@@ -139,6 +214,9 @@ public class FirebaseUpdateService extends IntentService {
 
                 if (entity == null || key == null)
                     return;
+
+                if (entity.Todos == null)
+                    entity.Todos = new ArrayList<>();
 
                 for (TodoItem todoItem : entity.Todos) {
                     if (todoItem.userId.equals(userGuid) && todoItem.id.equals(todoGuid))
@@ -384,6 +462,9 @@ public class FirebaseUpdateService extends IntentService {
 
                 if (entity == null || key == null)
                     return;
+
+                if (entity.Messages == null)
+                    entity.Messages = new ArrayList<>();
 
                 for (Message message : entity.Messages) {
                     if (message.creatorId.equals(creatorGuid) && message.id.equals(messageGuid))

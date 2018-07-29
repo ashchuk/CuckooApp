@@ -87,7 +87,7 @@ public class FirebaseQueryService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         mUsersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
-        attachDatabaseReadListener();
+//        attachDatabaseReadListener();
         return super.onStartCommand(intent, flags, startId);
     }
 

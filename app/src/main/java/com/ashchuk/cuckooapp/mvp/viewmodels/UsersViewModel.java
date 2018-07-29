@@ -32,8 +32,5 @@ public class UsersViewModel extends ViewModel {
         SubscriptionsRepository
                 .getSubscriptionByUserId(userGuid)
                 .subscribe(result -> subscriptions.setValue(result));
-//        SubscriptionsRepository
-//                .getSubscriptions()
-//                .subscribe(result -> subscriptions.setValue(result));
     }
 }
