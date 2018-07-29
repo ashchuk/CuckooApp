@@ -4,22 +4,24 @@
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/nav_account"
-            android:icon="@drawable/account_circle"
-            android:title="Account" />
+        <!--TODO: add user account feature-->
+        <!--<item-->
+            <!--android:id="@+id/nav_account"-->
+            <!--android:icon="@drawable/account_circle"-->
+            <!--android:title="Account" />-->
         <item
             android:id="@+id/nav_search"
             android:icon="@drawable/account_search"
-            android:title="Find user" />
-        <item
-            android:id="@+id/nav_todos"
-            android:icon="@drawable/format_list_numbers"
-            android:title="Todos" />
+            android:title="@string/find_user_title" />
+        <!--TODO: implement todos feature-->
+        <!--<item-->
+            <!--android:id="@+id/nav_todos"-->
+            <!--android:icon="@drawable/format_list_numbers"-->
+            <!--android:title="Todos" />-->
         <item
             android:id="@+id/nav_subscriptions"
             android:icon="@drawable/comment_account_outline"
-            android:title="Subscriptions" />
+            android:title="@string/subscriptions_title" />
     </group>
 
     <group>
@@ -27,7 +29,7 @@
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/logout"
-                android:title="Logout" />
+                android:title="@string/logout_title" />
         </menu>
     </group>
 

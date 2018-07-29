@@ -15,6 +15,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import static com.ashchuk.cuckooapp.infrastructure.Constants.EMAIL_FIREBASE_KEY_NAME;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.GUID_FIREBASE_KEY_NAME;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USERS_FIREBASE_REFERENCE_NAME;
+
 public class FirebaseQueryService extends Service {
 
     private DatabaseReference mUsersDatabaseReference;
@@ -25,47 +29,18 @@ public class FirebaseQueryService extends Service {
     public FirebaseQueryService() {
     }
 
-    private void attachDatabaseReadListener() {
-        if (mChildEventListener == null) {
-            mChildEventListener = new ChildEventListener() {
-                @Override
-                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                    FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
-                }
-
-                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-                    FirebaseUserEntity user = dataSnapshot.getValue(FirebaseUserEntity.class);
-                    Toast.makeText(getApplicationContext(),
-                            "Changed user name is " + user.DisplayName,
-                            Toast.LENGTH_SHORT)
-                            .show();
-                }
-
-                public void onChildRemoved(DataSnapshot dataSnapshot) {
-                }
-
-                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-                }
-
-                public void onCancelled(DatabaseError databaseError) {
-                }
-            };
-            mUsersDatabaseReference.addChildEventListener(mChildEventListener);
-        }
-    }
-
     public void AddGetAllUsersListener(ValueEventListener listener) {
-        Query query = mUsersDatabaseReference.orderByChild("Guid");
+        Query query = mUsersDatabaseReference.orderByChild(GUID_FIREBASE_KEY_NAME);
         query.addListenerForSingleValueEvent(listener);
     }
 
     public void AddGetUserByGuidListener(ValueEventListener listener, String guid) {
-        Query query = mUsersDatabaseReference.orderByChild("Guid").equalTo(guid).limitToFirst(1);
+        Query query = mUsersDatabaseReference.orderByChild(GUID_FIREBASE_KEY_NAME).equalTo(guid).limitToFirst(1);
         query.addListenerForSingleValueEvent(listener);
     }
 
     public void AddGetUserByEmailListener(ValueEventListener listener, String email) {
-        Query query = mUsersDatabaseReference.orderByChild("Email").equalTo(email).limitToFirst(1);
+        Query query = mUsersDatabaseReference.orderByChild(EMAIL_FIREBASE_KEY_NAME).equalTo(email).limitToFirst(1);
         query.addListenerForSingleValueEvent(listener);
     }
 
@@ -86,8 +61,7 @@ public class FirebaseQueryService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mUsersDatabaseReference = FirebaseDatabase.getInstance().getReference().child("users");
-//        attachDatabaseReadListener();
+        mUsersDatabaseReference = FirebaseDatabase.getInstance().getReference().child(USERS_FIREBASE_REFERENCE_NAME);
         return super.onStartCommand(intent, flags, startId);
     }
 

@@ -48,10 +48,10 @@ public class SubscriptionsActivityPresenter extends MvpPresenter<ISubscriptionsA
     }
 
     public Observable<FirebaseUserEntity> GetFirebaseUser() {
-//        return FirebaseUserEntityCreator
-//                .create(FirebaseAuth.getInstance().getCurrentUser().getUid());
         return FirebaseUserEntityCreator
-                .createDummy(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                .create(FirebaseAuth.getInstance().getCurrentUser().getUid());
+//        return FirebaseUserEntityCreator
+//                .createDummy(FirebaseAuth.getInstance().getCurrentUser().getUid());
     }
 
     public void syncUserData(String userGuid, FirebaseQueryService queryService) {

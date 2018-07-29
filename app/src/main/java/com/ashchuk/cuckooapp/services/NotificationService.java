@@ -31,6 +31,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.Date;
 
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USERS_FIREBASE_REFERENCE_NAME;
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_GUID_FLAG;
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
 
@@ -104,7 +105,7 @@ public class NotificationService extends Service {
                         }
 
                         startForeground(101, CreateNotification(icon));
-                    } else{
+                    } else {
                         FirebaseUpdateService.updateUserSubscription(getApplicationContext(),
                                 user.Guid, user.Status, user.LastUpdateDate.toString());
                     }
@@ -137,37 +138,38 @@ public class NotificationService extends Service {
         else
             channelId = "";
 
-        MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(), "cuckoo");
+        MediaSessionCompat mMediaSession = new MediaSessionCompat(getApplicationContext(),
+                getString(R.string.app_name));
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Notification notification = new NotificationCompat.Builder(getApplicationContext(), channelId)
                 .setSound(alarmSound)
                 .setSmallIcon(currentIcon)
-                .addAction(R.drawable.home_icon, "Home",
+                .addAction(R.drawable.home_icon, getString(R.string.home_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.HOME,
                                         FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                .addAction(R.drawable.work_icon, "Work",
+                .addAction(R.drawable.work_icon, getString(R.string.on_work_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.WORK,
                                         FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                .addAction(R.drawable.food_icon, "Lunch",
+                .addAction(R.drawable.food_icon, getString(R.string.lunch_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.LUNCH,
                                         FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                .addAction(R.drawable.walk_icon, "Walking",
+                .addAction(R.drawable.walk_icon, getString(R.string.lunch_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.WALK,
                                         FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                .addAction(R.drawable.car_icon, "Driving",
+                .addAction(R.drawable.car_icon, getString(R.string.drive_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.DRIVE,
                                         FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                .addAction(R.drawable.sleep_icon, "Sleep",
+                .addAction(R.drawable.sleep_icon, getString(R.string.sleep_label),
                         FirebaseUpdateService
                                 .createChangeUserStatusPendingtIntent(getApplicationContext(),
                                         UserStatus.SLEEP,
@@ -176,7 +178,7 @@ public class NotificationService extends Service {
                         .setShowActionsInCompactView(1, 2, 3 /* #1: pause button */)
                         .setMediaSession(mMediaSession.getSessionToken()))
                 .setContentTitle(getString(R.string.app_name))
-                .setContentText("You can set your current status here")
+                .setContentText(getString(R.string.set_status_label))
                 .build();
 
         return notification;
@@ -185,7 +187,7 @@ public class NotificationService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Integer currentIcon = intent.getIntExtra(USER_STATUS_FLAG, R.drawable.home_icon);
-        mUserReference = FirebaseDatabase.getInstance().getReference().child("users");
+        mUserReference = FirebaseDatabase.getInstance().getReference().child(USERS_FIREBASE_REFERENCE_NAME);
         attachDatabaseReadListener();
         startForeground(101, CreateNotification(currentIcon));
         return START_STICKY;
@@ -193,8 +195,8 @@ public class NotificationService extends Service {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private String createNotificationChannel() {
-        String channelId = "CuckooApp";
-        String channelName = "CuckooApp Service";
+        String channelId = getString(R.string.app_name);
+        String channelName = getString(R.string.app_name);
         NotificationChannel chan = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_NONE);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);

@@ -8,32 +8,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="8dp"
+        android:layout_margin="@dimen/margin_8dp"
         android:orientation="horizontal"
-        android:padding="2dp">
+        android:padding="@dimen/padding_2dp">
 
         <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_width="@dimen/list_item_circle_view_64dp"
+            android:layout_height="@dimen/list_item_circle_view_64dp"
             android:src="@drawable/image" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="@dimen/margin_10dp"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="5dp"
+                android:layout_margin="@dimen/margin_4dp"
                 tools:text="John Doe" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_margin="5dp"
+                android:layout_margin="@dimen/margin_4dp"
                 tools:text="example@example.com" />
 
         </LinearLayout>
@@ -42,9 +42,9 @@
 
     <View
         android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
+        android:layout_height="@dimen/separator_height"
+        android:layout_marginLeft="@dimen/margin_8dp"
+        android:layout_marginRight="@dimen/margin_8dp"
         android:background="@android:color/darker_gray" />
 
 

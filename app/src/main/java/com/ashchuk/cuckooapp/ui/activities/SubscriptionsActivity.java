@@ -62,6 +62,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.ashchuk.cuckooapp.infrastructure.Constants.AUTH_PROVIDERS;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USERS_FIREBASE_REFERENCE_NAME;
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
 
 public class SubscriptionsActivity
@@ -109,6 +110,7 @@ public class SubscriptionsActivity
                 .includeContentSubscriptions
                 .subscriptionsList.setAdapter(new SubscriptionsListAdapter(new ArrayList<>(),
                 (v, subscription) -> {
+
                 }));
 
         binding.includeAppBarSubscriptions
@@ -179,7 +181,7 @@ public class SubscriptionsActivity
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
         LocalBroadcastManager.getInstance(CuckooApp.getAppComponent().getContext())
                 .registerReceiver(mMessageReceiver,
-                        new IntentFilter("update"));
+                        new IntentFilter(getString(R.string.broadcast_update)));
     }
 
     @Override
@@ -237,7 +239,7 @@ public class SubscriptionsActivity
                         .observeOn(Schedulers.io())
                         .subscribeOn(AndroidSchedulers.mainThread())
                         .subscribe(firebaseUserEntity -> FirebaseDatabase.getInstance()
-                                .getReference().child("users")
+                                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
                                 .push().setValue(firebaseUserEntity));
 
             }
@@ -267,12 +269,12 @@ public class SubscriptionsActivity
         int id = item.getItemId();
         Intent intent = new Intent();
 
-        if (id == R.id.nav_account) {
-            intent.setClass(this, AccountActivity.class);
-        } else if (id == R.id.nav_search) {
+//        if (id == R.id.nav_account) {
+//            intent.setClass(this, AccountActivity.class);
+        if (id == R.id.nav_search) {
             intent.setClass(this, SearchActivity.class);
-        } else if (id == R.id.nav_todos) {
-            intent.setClass(this, TodoListActivity.class);
+//        } else if (id == R.id.nav_todos) {
+//            intent.setClass(this, TodoListActivity.class);
         } else if (id == R.id.nav_logout) {
             AuthUI.getInstance().signOut(this);
         }

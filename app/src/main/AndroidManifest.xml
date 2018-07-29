@@ -46,7 +46,7 @@
         <service
             android:name=".services.FirebaseQueryService"
             android:enabled="true"
-            android:exported="true"></service>
+            android:exported="true"/>
     </application>
 
 </manifest>

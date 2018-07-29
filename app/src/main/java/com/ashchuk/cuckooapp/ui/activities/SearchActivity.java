@@ -49,6 +49,8 @@ public class SearchActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+
         RecyclerView recyclerView = findViewById(R.id.users_list);
         recyclerView.setAdapter(new UsersSearchListAdapter(testList));
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
@@ -85,7 +87,6 @@ public class SearchActivity
                             testList.add(FirebaseUserEntityToUserConverter
                                     .convert(Objects.requireNonNull(result)));
                     }
-                    Toast.makeText(SearchActivity.this, "TestList count == " + testList.size(), Toast.LENGTH_SHORT).show();
                     UsersSearchListAdapter adapter = (UsersSearchListAdapter) recyclerView.getAdapter();
 
                     adapter.UpdateList(testList);

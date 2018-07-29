@@ -25,7 +25,7 @@ public class SubscriptionsViewHolder extends RecyclerView.ViewHolder {
     public void bindViewHolder(Subscription subscription) {
         this.subscription = subscription;
 
-        SimpleDateFormat format = new SimpleDateFormat("MM-dd HH:MM");
+        SimpleDateFormat format = new SimpleDateFormat("MM-dd hh:mm");
         String formattedDate = format.format(subscription.lastUpdateDate);
 
         binding.setSubscription(subscription);

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.ashchuk.cuckooapp.CuckooApp;
+import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.model.entities.Message;
 import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.entities.TodoItem;
@@ -31,6 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.reactivex.schedulers.Schedulers;
+
+import static com.ashchuk.cuckooapp.infrastructure.Constants.GUID_FIREBASE_KEY_NAME;
+import static com.ashchuk.cuckooapp.infrastructure.Constants.USERS_FIREBASE_REFERENCE_NAME;
 
 public class FirebaseUpdateService extends IntentService {
     private static final String UPDATE_STATUS = "com.ashchuk.cuckooapp.services.action.UPDATE_STATUS";
@@ -150,8 +154,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleSubscriptionUpdate(String userGuid, Integer status, Date updateDate) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -175,7 +179,7 @@ public class FirebaseUpdateService extends IntentService {
                         subscription.status = status;
                         SubscriptionsRepository.insertSubscription(subscription).subscribe();
 
-                        Intent intent = new Intent("update");
+                        Intent intent = new Intent(getString(R.string.broadcast_update));
                         LocalBroadcastManager.getInstance(CuckooApp.getAppComponent().getContext())
                                 .sendBroadcast(intent);
                     }
@@ -183,7 +187,7 @@ public class FirebaseUpdateService extends IntentService {
 
                 FirebaseDatabase.getInstance()
                         .getReference()
-                        .child("users")
+                        .child(USERS_FIREBASE_REFERENCE_NAME)
                         .child(key)
                         .setValue(entity);
             }
@@ -199,8 +203,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleTodoDone(String userGuid, String todoGuid) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -225,7 +229,7 @@ public class FirebaseUpdateService extends IntentService {
 
                 FirebaseDatabase.getInstance()
                         .getReference()
-                        .child("users")
+                        .child(USERS_FIREBASE_REFERENCE_NAME)
                         .child(key)
                         .setValue(entity);
             }
@@ -241,8 +245,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleGpsSet(String userGuid, String gps) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -274,8 +278,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleTodoRemove(String userGuid, String todoGuid) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -317,8 +321,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleTodoAdd(String userGuid, String creatorGuid, String todoGuid) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -343,7 +347,7 @@ public class FirebaseUpdateService extends IntentService {
 
                             FirebaseDatabase.getInstance()
                                     .getReference()
-                                    .child("users")
+                                    .child(USERS_FIREBASE_REFERENCE_NAME)
                                     .child(finalKey)
                                     .setValue(finalEntity);
                         });
@@ -359,8 +363,8 @@ public class FirebaseUpdateService extends IntentService {
 
     private void handleSubscriptionAdd(String userGuid, String subscriptionGuid) {
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -388,7 +392,7 @@ public class FirebaseUpdateService extends IntentService {
 
                             FirebaseDatabase.getInstance()
                                     .getReference()
-                                    .child("users")
+                                    .child(USERS_FIREBASE_REFERENCE_NAME)
                                     .child(finalKey)
                                     .setValue(finalEntity);
                         });
@@ -404,8 +408,8 @@ public class FirebaseUpdateService extends IntentService {
     private void handleSubscriptionRemove(String userGuid, String subscriptionGuid) {
 
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -431,7 +435,7 @@ public class FirebaseUpdateService extends IntentService {
 
                             FirebaseDatabase.getInstance()
                                     .getReference()
-                                    .child("users")
+                                    .child(USERS_FIREBASE_REFERENCE_NAME)
                                     .child(finalKey)
                                     .setValue(finalEntity);
                         });
@@ -447,8 +451,8 @@ public class FirebaseUpdateService extends IntentService {
 
     private void handleMessageUpdating(String userGuid, String creatorGuid, String messageGuid, String messageText) {
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -473,7 +477,7 @@ public class FirebaseUpdateService extends IntentService {
 
                 FirebaseDatabase.getInstance()
                         .getReference()
-                        .child("users")
+                        .child(USERS_FIREBASE_REFERENCE_NAME)
                         .child(key)
                         .setValue(entity);
             }
@@ -487,8 +491,8 @@ public class FirebaseUpdateService extends IntentService {
 
     private void handleStatusUpdating(UserStatus userStatus, String userGuid) {
         FirebaseDatabase.getInstance()
-                .getReference().child("users")
-                .orderByChild("Guid")
+                .getReference().child(USERS_FIREBASE_REFERENCE_NAME)
+                .orderByChild(GUID_FIREBASE_KEY_NAME)
                 .equalTo(userGuid)
                 .limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -508,7 +512,7 @@ public class FirebaseUpdateService extends IntentService {
 
                 FirebaseDatabase.getInstance()
                         .getReference()
-                        .child("users")
+                        .child(USERS_FIREBASE_REFERENCE_NAME)
                         .child(key)
                         .setValue(entity);
             }

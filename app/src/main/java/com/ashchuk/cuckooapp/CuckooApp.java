@@ -19,12 +19,20 @@ public class CuckooApp extends Application {
     public void onCreate() {
         super.onCreate();
 
+        Thread.setDefaultUncaughtExceptionHandler (this::handleUncaughtException);
+
         sAppComponent = DaggerAppComponent.builder()
                 .contextModule(new ContextModule(this))
                 .build();
 
         mDatabase = Room.databaseBuilder(this, CuckooAppDB.class, "database")
                 .build();
+    }
+
+    public void handleUncaughtException (Thread thread, Throwable e)
+    {
+        e.printStackTrace();
+        System.exit(1);
     }
 
     public static AppComponent getAppComponent() {
