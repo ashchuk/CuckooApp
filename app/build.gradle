@@ -2,6 +2,15 @@ apply plugin: 'com.android.application'
 
 android {
 
+    signingConfigs {
+        debug {
+            keyAlias 'key0'
+            keyPassword 'QweAsd123'
+            storeFile file('../signing/cuckooapp.jks')
+            storePassword 'QweAsd123'
+        }
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -21,12 +30,17 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
+
 
 dependencies {
     def aac_version = "1.1.1"

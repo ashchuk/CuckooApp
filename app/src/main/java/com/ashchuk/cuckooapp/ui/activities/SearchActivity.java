@@ -19,8 +19,6 @@ import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.mvp.presenters.SearchActivityPresenter;
 import com.ashchuk.cuckooapp.mvp.views.ISearchActivityView;
 import com.ashchuk.cuckooapp.services.FirebaseQueryService;
-import com.ashchuk.cuckooapp.services.NotificationService;
-import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.ashchuk.cuckooapp.ui.adapters.UsersSearchListAdapter;
 import com.ashchuk.cuckooapp.ui.helpers.SwipeToAddCallback;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,17 +40,15 @@ public class SearchActivity
     private FirebaseQueryService queryService;
     private ServiceConnection serviceConnection;
 
-    private List<User> testList = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-
         RecyclerView recyclerView = findViewById(R.id.users_list);
-        recyclerView.setAdapter(new UsersSearchListAdapter(testList));
+        recyclerView.setAdapter(new UsersSearchListAdapter(users));
         recyclerView.setLayoutManager(new LinearLayoutManager(SearchActivity.this));
 
         SwipeToAddCallback handler = new SwipeToAddCallback(0, ItemTouchHelper.LEFT) {
@@ -60,7 +56,7 @@ public class SearchActivity
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 UsersSearchListAdapter adapter = (UsersSearchListAdapter)
                         recyclerView.getAdapter();
-                searchActivityPresenter.InsertSubscriptionIntoDb(SearchActivity.this,
+                SearchActivityPresenter.InsertSubscriptionIntoDb(SearchActivity.this,
                         adapter.createSubscription(viewHolder.getAdapterPosition()));
                 adapter.removeAt(viewHolder.getAdapterPosition());
                 super.onSwiped(viewHolder, direction);
@@ -76,7 +72,7 @@ public class SearchActivity
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
-                    testList.clear();
+                    users.clear();
                     for (DataSnapshot user : dataSnapshot.getChildren()) {
                         FirebaseUserEntity result = user.getValue(FirebaseUserEntity.class);
 
@@ -84,12 +80,12 @@ public class SearchActivity
                             continue;
 
                         if (!result.Guid.equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
-                            testList.add(FirebaseUserEntityToUserConverter
+                            users.add(FirebaseUserEntityToUserConverter
                                     .convert(Objects.requireNonNull(result)));
                     }
                     UsersSearchListAdapter adapter = (UsersSearchListAdapter) recyclerView.getAdapter();
 
-                    adapter.UpdateList(testList);
+                    adapter.UpdateList(users);
                 }
             }
 
@@ -106,7 +102,7 @@ public class SearchActivity
             }
 
             public void onServiceDisconnected(ComponentName name) {
-                Toast.makeText(SearchActivity.this, "Service disconnected" + testList.size(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, "Service disconnected" + users.size(), Toast.LENGTH_SHORT).show();
             }
         };
     }
