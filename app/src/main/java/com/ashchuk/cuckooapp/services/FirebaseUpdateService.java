@@ -2,7 +2,6 @@ package com.ashchuk.cuckooapp.services;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -17,15 +16,12 @@ import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
-import com.ashchuk.cuckooapp.mvp.viewmodels.UsersViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;

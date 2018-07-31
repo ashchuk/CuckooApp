@@ -9,7 +9,7 @@ public enum UserStatus {
     private int value;
     private static Map map = new HashMap<>();
 
-    private UserStatus(int value) {
+    UserStatus(int value) {
         this.value = value;
     }
 

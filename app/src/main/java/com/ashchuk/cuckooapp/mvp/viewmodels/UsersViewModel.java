@@ -5,10 +5,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 
 import com.ashchuk.cuckooapp.model.entities.Subscription;
-import com.ashchuk.cuckooapp.model.entities.User;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
-import com.ashchuk.cuckooapp.model.repositories.UserRepository;
-import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;

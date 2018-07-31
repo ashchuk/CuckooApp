@@ -17,7 +17,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 
 import com.ashchuk.cuckooapp.R;
-import com.ashchuk.cuckooapp.model.entities.Subscription;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -26,13 +25,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.Date;
 
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USERS_FIREBASE_REFERENCE_NAME;
-import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_GUID_FLAG;
 import static com.ashchuk.cuckooapp.infrastructure.Constants.USER_STATUS_FLAG;
 
 // startForeground fail after upgrade to Android 8.1

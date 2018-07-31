@@ -9,7 +9,7 @@ public enum TodoItemType {
     private int value;
     private static Map map = new HashMap<>();
 
-    private TodoItemType(int value) {
+    TodoItemType(int value) {
         this.value = value;
     }
 

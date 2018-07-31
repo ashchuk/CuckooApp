@@ -1,18 +1,11 @@
 package com.ashchuk.cuckooapp.infrastructure.helpers;
 
-import com.ashchuk.cuckooapp.model.entities.Message;
-import com.ashchuk.cuckooapp.model.entities.Subscription;
-import com.ashchuk.cuckooapp.model.entities.TodoItem;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.MessagesRepository;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 
 import io.reactivex.Observable;
 
