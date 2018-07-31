@@ -35,6 +35,7 @@
             android:layout_alignParentRight="true"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
+            android:contentDescription="@string/expand_all_actions"
             app:fab_addButtonColorNormal="@color/colorPrimary"
             app:fab_addButtonColorPressed="@color/colorAccent"
             app:fab_addButtonPlusIconColor="@color/browser_actions_bg_grey"
@@ -48,7 +49,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/home_icon"
                 app:fab_size="mini"
-                app:fab_title="At home" />
+                app:fab_title="At home"
+                android:contentDescription="@string/set_home_status"/>
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_status_work"
@@ -58,7 +60,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/work_icon"
                 app:fab_size="mini"
-                app:fab_title="At work" />
+                app:fab_title="At work"
+                android:contentDescription="@string/set_job_status"/>
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_status_lunch"
@@ -68,7 +71,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/food_icon"
                 app:fab_size="mini"
-                app:fab_title="At lunch" />
+                app:fab_title="At lunch"
+                android:contentDescription="@string/set_lunch_status"/>
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_status_walk"
@@ -78,7 +82,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/walk_icon"
                 app:fab_size="mini"
-                app:fab_title="Walking" />
+                app:fab_title="Walking"
+                android:contentDescription="@string/set_walking_status"/>
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_status_car"
@@ -88,7 +93,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/car_icon"
                 app:fab_size="mini"
-                app:fab_title="Driving" />
+                app:fab_title="Driving"
+                android:contentDescription="@string/set_driving_status"/>
 
             <com.getbase.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fab_status_sleep"
@@ -98,7 +104,8 @@
                 app:fab_colorPressed="@color/colorPrimary"
                 app:fab_icon="@drawable/sleep_icon"
                 app:fab_size="mini"
-                app:fab_title="Sleeping" />
+                app:fab_title="Sleeping"
+                android:contentDescription="@string/set_sleeping_status"/>
 
         </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

@@ -152,7 +152,8 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerInParent="true"
                             android:layout_gravity="end"
-                            android:src="@drawable/google_maps" />
+                            android:src="@drawable/google_maps"
+                            android:contentDescription="@string/set_job_coords" />
 
                     </RelativeLayout>
 
@@ -190,7 +191,8 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerInParent="true"
                             android:layout_gravity="end"
-                            android:src="@drawable/google_maps" />
+                            android:src="@drawable/google_maps"
+                            android:contentDescription="@string/set_home_coords" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -243,7 +245,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_margin="@dimen/margin_4dp"
-                        android:src="@android:drawable/stat_sys_headset" />
+                        android:src="@android:drawable/stat_sys_headset"
+                        android:contentDescription="@string/current_user_status" />
 
                     <TextView
                         android:layout_width="wrap_content"

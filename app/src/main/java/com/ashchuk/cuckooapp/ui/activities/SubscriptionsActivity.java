@@ -21,6 +21,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.arellomobile.mvp.MvpAppCompatActivity;
@@ -54,6 +55,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -89,6 +91,8 @@ public class SubscriptionsActivity
     };
 
     private ActivitySubscriptionsBinding binding;
+
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,8 +148,23 @@ public class SubscriptionsActivity
                 .changeUserStatus(this, UserStatus.SLEEP,
                         FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
-        if (FirebaseAuth.getInstance().getCurrentUser() != null)
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             fillSubscriptionsList(true);
+
+            UserRepository.getUserByUserId(FirebaseAuth.getInstance()
+                    .getCurrentUser().getUid()).subscribe(user -> {
+                        if (user != null) {
+                            currentUser = user;
+                            TextView tvUsername = binding.navView.getHeaderView(0)
+                                    .findViewById(R.id.tv_username);
+                            TextView tvEmail = binding.navView.getHeaderView(0)
+                                    .findViewById(R.id.tv_email);
+                            tvUsername.setText(currentUser.DisplayName);
+                            tvEmail.setText(currentUser.Email);
+                        }
+                    }
+            );
+        }
 
         serviceConnection = new ServiceConnection() {
             public void onServiceConnected(ComponentName name, IBinder binder) {
@@ -170,7 +189,38 @@ public class SubscriptionsActivity
                                     (SubscriptionsListAdapter) binding.includeAppBarSubscriptions
                                             .includeContentSubscriptions
                                             .subscriptionsList.getAdapter();
-                            adapter.updateSubscriptions(subscriptions);
+                            if (subscriptions == null) {
+                                Subscription subscriptionFirst = new Subscription();
+                                subscriptionFirst.DisplayName = "There is no active subscriptions";
+                                subscriptionFirst.status = UserStatus.HOME.getValue();
+                                subscriptionFirst.lastUpdateDate = new Date();
+
+                                Subscription subscriptionSecond = new Subscription();
+                                subscriptionFirst.DisplayName = "Add some new subscriptions!";
+                                subscriptionFirst.status = UserStatus.WALK.getValue();
+                                subscriptionSecond.lastUpdateDate = new Date();
+
+                                List<Subscription> dummy = new ArrayList<>(Arrays
+                                        .asList(subscriptionFirst, subscriptionSecond));
+                                adapter.updateSubscriptions(dummy);
+                            }
+                            if (subscriptions.size() == 0) {
+                                Subscription subscriptionFirst = new Subscription();
+                                subscriptionFirst.DisplayName = "There is no active subscriptions";
+                                subscriptionFirst.status = UserStatus.HOME.getValue();
+                                subscriptionFirst.lastUpdateDate = new Date();
+
+                                Subscription subscriptionSecond = new Subscription();
+                                subscriptionSecond.DisplayName = "Add some new subscriptions!";
+                                subscriptionSecond.status = UserStatus.WALK.getValue();
+                                subscriptionSecond.lastUpdateDate = new Date();
+
+                                List<Subscription> dummy = new ArrayList<>(Arrays
+                                        .asList(subscriptionFirst, subscriptionSecond));
+                                adapter.updateSubscriptions(dummy);
+                            } else {
+                                adapter.updateSubscriptions(subscriptions);
+                            }
                         }
                 );
     }
@@ -214,13 +264,20 @@ public class SubscriptionsActivity
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
 
-                User user = subscriptionsActivityPresenter
+                currentUser = subscriptionsActivityPresenter
                         .InsertUserIntoDb(FirebaseAuth.getInstance().getCurrentUser());
 
-                checkFirebaseUserExists(user);
+                if (currentUser != null) {
+                    TextView tvUsername = binding.navView.getHeaderView(0).findViewById(R.id.tv_username);
+                    TextView tvEmail = binding.navView.getHeaderView(0).findViewById(R.id.tv_email);
+                    tvUsername.setText(currentUser.DisplayName);
+                    tvEmail.setText(currentUser.Email);
+                }
+
+                checkFirebaseUserExists(currentUser);
                 fillSubscriptionsList(false);
 
-                Toast.makeText(this, "Welcome back, " + user.DisplayName, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Welcome back, " + currentUser.DisplayName, Toast.LENGTH_SHORT).show();
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "Sign in canceled", Toast.LENGTH_SHORT).show();
                 finish();

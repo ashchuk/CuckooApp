@@ -10,12 +10,13 @@ import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class UsersViewModel extends ViewModel {
     private MutableLiveData<List<Subscription>> subscriptions;
 
-    public void cleanDataset(){
+    public void cleanDataset() {
         subscriptions = null;
     }
 
@@ -31,6 +32,7 @@ public class UsersViewModel extends ViewModel {
     private void loadSubscriptions(String userGuid) {
         SubscriptionsRepository
                 .getSubscriptionByUserId(userGuid)
-                .subscribe(result -> subscriptions.setValue(result));
+                .subscribe(result -> subscriptions
+                        .setValue(result == null ? new ArrayList<>() : result));
     }
 }

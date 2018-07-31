@@ -12,7 +12,6 @@
         android:id="@+id/view"
         android:layout_width="match_parent"
         android:layout_height="@dimen/account_layout_height"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginBottom="@dimen/account_layout_margin_bottom"
@@ -55,7 +54,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:text="@string/subscribe_for_status_changes"
                             android:textSize="@dimen/text_size_18sp" />
@@ -64,7 +62,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
                             android:layout_gravity="end" />
 
                     </RelativeLayout>
@@ -79,7 +76,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_centerInParent="true"
                             android:text="@string/add_todo_item"
@@ -89,10 +85,10 @@
                             android:layout_width="@dimen/imageview_width_32dp"
                             android:layout_height="@dimen/imageview_width_32dp"
                             android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
                             android:layout_centerInParent="true"
                             android:layout_gravity="end"
-                            android:src="@drawable/ic_playlist_add_black_24dp" />
+                            android:src="@drawable/ic_playlist_add_black_24dp"
+                            android:contentDescription="@string/add_new_todo" />
 
                     </RelativeLayout>
 
@@ -106,7 +102,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_centerInParent="true"
                             android:text="@string/get_gps_coords"
@@ -116,10 +111,10 @@
                             android:layout_width="@dimen/imageview_width_32dp"
                             android:layout_height="@dimen/imageview_width_32dp"
                             android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
                             android:layout_centerInParent="true"
                             android:layout_gravity="end"
-                            android:src="@drawable/ic_my_location_black_24dp" />
+                            android:src="@drawable/ic_my_location_black_24dp"
+                            android:contentDescription="@string/get_user_coords" />
                     </RelativeLayout>
 
                     <RelativeLayout
@@ -132,7 +127,6 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentLeft="true"
                             android:layout_alignParentStart="true"
                             android:layout_centerInParent="true"
                             android:text="@string/refresh_status"
@@ -142,10 +136,10 @@
                             android:layout_width="@dimen/imageview_width_32dp"
                             android:layout_height="@dimen/imageview_width_32dp"
                             android:layout_alignParentEnd="true"
-                            android:layout_alignParentRight="true"
                             android:layout_centerInParent="true"
                             android:layout_gravity="end"
-                            android:src="@drawable/ic_sync_black_24dp" />
+                            android:src="@drawable/ic_sync_black_24dp"
+                            android:contentDescription="@string/sync_button_description" />
                     </RelativeLayout>
 
                 </LinearLayout>
@@ -155,7 +149,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_16dp"
-                android:layout_alignParentLeft="true"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true">
 
@@ -198,7 +191,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_margin="@dimen/margin_4dp"
-                        android:src="@android:drawable/stat_sys_headset" />
+                        android:src="@android:drawable/stat_sys_headset"
+                        android:contentDescription="@string/current_user_status" />
 
                     <TextView
                         android:layout_width="wrap_content"

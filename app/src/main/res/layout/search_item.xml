@@ -21,7 +21,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_10dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:layout_marginStart="@dimen/margin_10dp">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -34,7 +35,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_margin="@dimen/margin_4dp"
-                tools:text="example@example.com" />
+                tools:text="example@example.com"
+                android:layout_alignParentStart="true" />
 
         </LinearLayout>
 
