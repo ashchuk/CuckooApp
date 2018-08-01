@@ -2,6 +2,8 @@ package com.ashchuk.cuckooapp.services;
 
 import android.app.IntentService;
 import android.app.PendingIntent;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -16,6 +18,8 @@ import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
+import com.ashchuk.cuckooapp.model.repositories.UserRepository;
+import com.ashchuk.cuckooapp.ui.CuckooAppWidget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -511,6 +515,14 @@ public class FirebaseUpdateService extends IntentService {
                         .child(USERS_FIREBASE_REFERENCE_NAME)
                         .child(key)
                         .setValue(entity);
+
+                AppWidgetManager appWidgetManager = AppWidgetManager
+                        .getInstance(CuckooApp.getAppComponent().getContext());
+                int[] appWidgetIds = appWidgetManager
+                        .getAppWidgetIds(new ComponentName(CuckooApp.getAppComponent().getContext(), CuckooAppWidget.class));
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ll_widget_view);
+                CuckooAppWidget.updateCuckooAppWidgets(CuckooApp.getAppComponent().getContext(),
+                        UserStatus.valueOf(entity.Status), appWidgetManager, appWidgetIds);
             }
 
             @Override

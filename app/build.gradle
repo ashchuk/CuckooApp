@@ -123,7 +123,7 @@ dependencies {
 
     //debugging
 
-    //    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
 }
 
 apply plugin: 'com.google.gms.google-services'

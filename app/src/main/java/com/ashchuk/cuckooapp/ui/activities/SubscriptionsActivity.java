@@ -1,5 +1,6 @@
 package com.ashchuk.cuckooapp.ui.activities;
 
+import android.appwidget.AppWidgetManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -36,6 +37,7 @@ import com.ashchuk.cuckooapp.mvp.views.ISubscriptionsActivityView;
 import com.ashchuk.cuckooapp.services.FirebaseQueryService;
 import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
 import com.ashchuk.cuckooapp.services.NotificationService;
+import com.ashchuk.cuckooapp.ui.CuckooAppWidget;
 import com.ashchuk.cuckooapp.ui.adapters.SubscriptionsListAdapter;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -263,6 +265,15 @@ public class SubscriptionsActivity
                     tvUsername.setText(currentUser.DisplayName);
                     tvEmail.setText(currentUser.Email);
                 }
+
+                AppWidgetManager appWidgetManager = AppWidgetManager
+                        .getInstance(CuckooApp.getAppComponent().getContext());
+                int[] appWidgetIds = appWidgetManager
+                        .getAppWidgetIds(new ComponentName(CuckooApp.getAppComponent().getContext(),
+                                CuckooAppWidget.class));
+                appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.ll_widget_view);
+                CuckooAppWidget.updateCuckooAppWidgets(CuckooApp.getAppComponent().getContext(),
+                        currentUser.Status, appWidgetManager, appWidgetIds);
 
                 checkFirebaseUserExists(currentUser);
                 fillSubscriptionsList(false);

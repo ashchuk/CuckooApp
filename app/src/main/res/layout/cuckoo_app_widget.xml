@@ -1,0 +1,105 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/browser_actions_bg_grey"
+    android:padding="@dimen/widget_margin"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_widget_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/margin_10dp"
+        android:layout_gravity="center_horizontal">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="@dimen/margin_10dp"
+            android:text="@string/current_status_widget_label"
+            android:layout_marginEnd="@dimen/margin_10dp" />
+
+        <TextView
+            android:id="@+id/tv_status_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            tools:text="At home"/>
+
+        <ImageView
+            android:id="@+id/iv_current_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/question_icon"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/margin_10dp"
+            android:contentDescription="@string/current_user_status"
+            android:layout_marginStart="@dimen/margin_10dp" />
+        
+    </LinearLayout>
+    
+    <GridLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:columnCount="3">
+
+        <ImageButton
+            android:id="@+id/ib_home"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/home_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/home_label"/>
+
+
+        <ImageButton
+            android:id="@+id/ib_work"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/work_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/on_work_label" />
+
+
+        <ImageButton
+            android:id="@+id/ib_lunch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/food_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/lunch_label"/>
+
+
+        <ImageButton
+            android:id="@+id/ib_walk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/walk_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/walk_label"/>
+
+
+        <ImageButton
+            android:id="@+id/ib_car"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/car_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/drive_label"/>
+
+
+        <ImageButton
+            android:id="@+id/ib_sleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/sleep_icon"
+            android:layout_margin="@dimen/margin_4dp"
+            android:contentDescription="@string/sleep_label"/>
+
+    </GridLayout>
+
+</LinearLayout>

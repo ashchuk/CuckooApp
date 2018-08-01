@@ -42,4 +42,7 @@
     <string name="set_walking_status">Set walking status</string>
     <string name="set_driving_status">Set driving status</string>
     <string name="set_sleeping_status">Set sleeping status</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
+    <string name="current_status_widget_label">Current status </string>
 </resources>
