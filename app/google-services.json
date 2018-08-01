@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "528705030996",
+    "firebase_url": "https://cuckooapp-project.firebaseio.com",
+    "project_id": "cuckooapp-project",
+    "storage_bucket": "cuckooapp-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528705030996:android:3b7fbd1265f0f7d7",
+        "android_client_info": {
+          "package_name": "com.ashchuk.cuckooapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "528705030996-1veut0rpau2arttugog5qhpoq2skd5hb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ashchuk.cuckooapp",
+            "certificate_hash": "312d2a784a9eceefd155ecb6d85890651e53ae53"
+          }
+        },
+        {
+          "client_id": "528705030996-llhhjuelq4grqds4d1nb4imhii2c4igk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZdIaA1kQOqshGF1q3LiJ1jTS6BSfdPOM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "528705030996-llhhjuelq4grqds4d1nb4imhii2c4igk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

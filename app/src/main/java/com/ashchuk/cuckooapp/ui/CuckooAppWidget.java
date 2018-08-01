@@ -12,7 +12,6 @@ import com.ashchuk.cuckooapp.R;
 import com.ashchuk.cuckooapp.infrastructure.helpers.UserStatusToImgSrcConverter;
 import com.ashchuk.cuckooapp.infrastructure.helpers.UserStatusToStringConverter;
 import com.ashchuk.cuckooapp.model.enums.UserStatus;
-import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.services.FirebaseUpdateService;
 import com.google.firebase.auth.FirebaseAuth;
 

@@ -2,7 +2,6 @@ package com.ashchuk.cuckooapp.model.repositories;
 
 import com.ashchuk.cuckooapp.CuckooApp;
 import com.ashchuk.cuckooapp.model.entities.User;
-import com.ashchuk.cuckooapp.model.enums.UserStatus;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -36,12 +35,4 @@ public class UserRepository {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread());
     }
-
-    public static Observable<Integer> updateUserStatus(UserStatus userStatus, String guid) {
-        return Observable
-                .fromCallable(() -> (int) CuckooApp.getDatabase().userDAO().update(userStatus, guid))
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
 }

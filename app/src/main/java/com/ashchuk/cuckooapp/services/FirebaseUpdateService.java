@@ -18,7 +18,6 @@ import com.ashchuk.cuckooapp.model.enums.UserStatus;
 import com.ashchuk.cuckooapp.model.firebase.FirebaseUserEntity;
 import com.ashchuk.cuckooapp.model.repositories.SubscriptionsRepository;
 import com.ashchuk.cuckooapp.model.repositories.TodoItemsRepositiry;
-import com.ashchuk.cuckooapp.model.repositories.UserRepository;
 import com.ashchuk.cuckooapp.ui.CuckooAppWidget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
